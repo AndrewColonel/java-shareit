@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.util.Collection;
@@ -23,7 +24,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(long userId, ItemDto itemDto) {
         // валидация  userDto и userId выполняется контроллером
         //валидация владелца как зарегистрированного пользоыателя
-        isUser(userId, userRepository.findAllUsers());
+        userRepository.findById(userId);
         return ItemMapper.toItemDto(
                 itemRepository.save(userId,
                         ItemMapper.toItem(itemDto)));
@@ -33,14 +34,17 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto updateItem(long userId, long itemId, ItemPatchDto itemPatchDto) {
         // валидация  itemId и userId выполняется контроллером
         // Редактировать вещь может только её владелец.
-        // валидация владелца как зарегистрированного пользоыателя
-        isUser(userId, userRepository.findAllUsers());
-        // валидация пользователя как владельца
-        isOwner(userId, itemId, itemRepository.findAllOwners());
-        // Валидация вещи для обновления
+
+        // валидация объекта Вещь для обновления
         isItemPatchDto(itemPatchDto);
+        // валидация владелца как зарегистрированного пользоыателя
+        userRepository.findById(userId);
+        // Валидация вещи для обновления
+        Item oldItem = itemRepository.findById(itemId);
+        // валидация пользователя как владельца
+        isOwner(userId, oldItem);
         return ItemMapper.toItemDto(
-                itemRepository.update(itemId,
+                itemRepository.update(itemId, oldItem,
                         ItemMapper.toItem(itemPatchDto)));
     }
 
@@ -56,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
     public Collection<ItemRequestDto> findAllItems(long userId) {
         // доступно только зарегисритрованному владельцу
         // валидация  itemId и userId выполняется контроллером
-        isUser(userId, userRepository.findAllUsers());
+        userRepository.findById(userId);
         return itemRepository.findAll(userId).stream()
                 .map(ItemMapper::toItemRequestDto)
                 .toList();
@@ -69,6 +73,4 @@ public class ItemServiceImpl implements ItemService {
                 .map(ItemMapper::toItemDto)
                 .toList();
     }
-
-
 }

@@ -1,10 +1,8 @@
 package ru.practicum.shareit.user;
 
 import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.exception.ValidationException;
 
-import java.util.Collection;
 import java.util.Objects;
 
 public class UserCheck {
@@ -17,19 +15,15 @@ public class UserCheck {
     }
 
     // метод валидации поля имени и  email пользователя
-    public static void isGetNameEmail(UserDto userDto, Collection<String> emails) {
+    public static void isGetNameEmail(UserDto userDto) {
         if (Objects.nonNull(userDto.getName())
                 && (userDto.getName().isBlank() || userDto.getName().isEmpty()))
             throw new ValidationException(String.format("Пользователь %s не прошел валидацию имени",
                     userDto));
-        if (Objects.nonNull(userDto.getEmail())) {
-            if (userDto.getEmail().isEmpty() || userDto.getEmail().isBlank())
-                throw new ValidationException(String.format("Пользователь %s не прошел валидацию почты",
-                        userDto));
-            if (emails.contains(userDto.getEmail()))
-                throw new DuplicatedDataException(String.format("Пользователь с такой почтой %s уже есть",
-                        userDto.getEmail()));
-        }
+        if (Objects.nonNull(userDto.getEmail())
+                && (userDto.getEmail().isEmpty() || userDto.getEmail().isBlank()))
+            throw new ValidationException(String.format("Пользователь %s не прошел валидацию почты",
+                    userDto));
     }
 
     // метод валидации поля id пользователя

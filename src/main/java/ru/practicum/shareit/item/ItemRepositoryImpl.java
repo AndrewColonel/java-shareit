@@ -25,19 +25,16 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item update(long itemId, Item newItem) {
-        Item item = items.get(itemId);
-        if (Objects.isNull(item)) throw new NotFoundException(
-                String.format("Вещь с ID %s не найдена", itemId));
-        if (Objects.nonNull(newItem.getName())) item.setName(newItem.getName());
-        if (Objects.nonNull(newItem.getDescription())) item.setDescription(newItem.getDescription());
-        if (Objects.nonNull(newItem.getAvailable())) item.setAvailable(newItem.getAvailable());
-        return item;
+    public Item update(long itemId, Item oldItem, Item newItem) {
+        if (Objects.nonNull(newItem.getName())) oldItem.setName(newItem.getName());
+        if (Objects.nonNull(newItem.getDescription())) oldItem.setDescription(newItem.getDescription());
+        if (Objects.nonNull(newItem.getAvailable())) oldItem.setAvailable(newItem.getAvailable());
+        return oldItem;
     }
 
     @Override
     public Item findById(long itemId) {
-        // Информацию о конкретной вещи по её идентификаторувещи
+        // Информацию о конкретной вещи по её идентификатору
         // может просмотреть любой пользователь.
         Item item = items.get(itemId);
         if (Objects.isNull(item)) throw new NotFoundException(
@@ -61,16 +58,7 @@ public class ItemRepositoryImpl implements ItemRepository {
                         (item.getAvailable().equals(true)
                                 && (item.getName().toLowerCase().contains(searchQuery.toLowerCase())
                                 || item.getDescription().toLowerCase().contains(searchQuery.toLowerCase()))))
-                                .collect(toSet());
-    }
-
-    @Override
-    public Map<Long, Set<Long>> findAllOwners() {
-        // получаю хранилище- апу с ключами - id пользователя-владельца
-        // и множествами id вещей этих владельцев
-        return items.values().stream()
-                .collect(groupingBy(Item::getOwner,
-                        mapping(Item::getId, toSet())));
+                .collect(toSet());
     }
 
     // вспомогательный метод получения следующего значения id

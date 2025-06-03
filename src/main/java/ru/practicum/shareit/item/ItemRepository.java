@@ -9,7 +9,7 @@ import java.util.Set;
 public interface ItemRepository {
     Item save(long userId, Item item);
 
-    Item update(long itemId, Item newItem);
+    Item update(long itemId, Item oldItem, Item newItem);
 
     Item findById(long itemId);
 
@@ -17,5 +17,4 @@ public interface ItemRepository {
 
     Collection<Item> search(String searchQuery);
 
-    Map<Long, Set<Long>> findAllOwners();
 }

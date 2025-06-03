@@ -2,11 +2,11 @@ package ru.practicum.shareit.user;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.DuplicatedDataException;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.exception.NotFoundException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
 @AllArgsConstructor
@@ -17,6 +17,8 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User save(User user) {
+        // проверка на совпадение почты, далее буждет выполняться ср6едсвами БД
+        isEqualEmail(user.getEmail());
         user.setId(getNextId());
         users.put(user.getId(), user);
         return user;
@@ -38,11 +40,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User update(long id, User newUser) {
-        User user = findById(id);
-        user.setName(newUser.getName());
-        user.setEmail(newUser.getEmail());
-        return user;
+    public User update(long id, User oldUser, User newUser) {
+        // проверка на совпадение почты, далее буждет выполняться ср6едсвами БД
+        if (Objects.nonNull(newUser.getEmail())) isEqualEmail(newUser.getEmail());
+        oldUser.setName(newUser.getName());
+        oldUser.setEmail(newUser.getEmail());
+        return oldUser;
     }
 
     @Override
@@ -52,17 +55,14 @@ public class UserRepositoryImpl implements UserRepository {
         return user;
     }
 
-    @Override
-    public Set<String> findAllEmail() {
-        // создаю множество-хранилище уникальных почтовых адресов пользователей
-        return users.values().stream()
+    // вспомогательный метод, создает множество-хранилище уникальных почтовых адресов пользователей
+    public void isEqualEmail(String userEmail) {
+        if (users.values().stream()
                 .map(User::getEmail)
-                .collect(Collectors.toSet());
-    }
-
-    @Override
-    public Set<Long> findAllUsers() {
-        return new HashSet<>(users.keySet());
+                .filter(Objects::nonNull)
+                .anyMatch(email -> email.equals(userEmail)))
+            throw new DuplicatedDataException(String.format("Пользователь с такой почтой %s уже есть",
+                    userEmail));
     }
 
     // вспомогательный метод получения следующего значения id
@@ -74,5 +74,4 @@ public class UserRepositoryImpl implements UserRepository {
                 .orElse(0);
         return ++currentMaxId;
     }
-
 }

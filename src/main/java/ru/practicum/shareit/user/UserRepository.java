@@ -11,11 +11,8 @@ public interface UserRepository {
 
     User findById(long id);
 
-    User update(long id, User user);
+    User update(long id, User oldUser, User newUser);
 
     User delete(long id);
 
-    Collection<String> findAllEmail();
-
-    Collection<Long> findAllUsers();
-}
+   }

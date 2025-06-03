@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 
@@ -19,7 +20,6 @@ public class UserServiceImpl implements UserService {
         // UserDto - един для POST и PATCH, поэтому форматно-логический контроль
         // делаю в сервисе
         isUserDto(userDto);
-        isGetNameEmail(userDto,userRepository.findAllEmail());
         return UserMapper.toUserDto(
                 userRepository.save(UserMapper.toUser(userDto)));
     }
@@ -33,21 +33,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findUserById(long id) {
-//        isGetId(id);
         return UserMapper.toUserDto(userRepository.findById(id));
     }
 
     @Override
     public UserDto updateUser(long id, UserDto userDto) {
-//        isGetId(id);
-        isGetNameEmail(userDto, userRepository.findAllEmail());
+        isGetNameEmail(userDto);
+        User oldUser = userRepository.findById(id);
         return UserMapper.toUserDto(
-                userRepository.update(id, UserMapper.toUser(userDto)));
+                userRepository.update(id, oldUser,
+                        UserMapper.toUser(userDto)));
     }
 
     @Override
     public UserDto deleteUser(long id) {
-//        isGetId(id);
         return UserMapper.toUserDto(userRepository.delete(id));
     }
 

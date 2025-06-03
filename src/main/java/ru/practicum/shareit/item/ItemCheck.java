@@ -3,11 +3,9 @@ package ru.practicum.shareit.item;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.model.Item;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class ItemCheck {
 
@@ -31,26 +29,11 @@ public class ItemCheck {
                     String.format("Вещь %s не прошла валидацию описания при обновлении", itemPatchDto));
     }
 
-    // метод валидации владельца как зарегистрированного пользователя
-    public static void isUser(long userId, Collection<Long> users) {
-        // проверяю - содержится ли id пользователя владельца в ключах мапы владельцев
-        if (!users.contains(userId))
-            throw new NotFoundException(
-                    String.format("пользователю ID %s не зарегистрирован", userId));
-    }
-
     // метод валидации пользователя как владельца конкретной вещи
-    public static void isOwner(long userId, long itemId, Map<Long, Set<Long>> owners) {
-        // проверяю, содержится ли id пользователя владельца в ключах мапы владельцев
-        // т.е. является ли данный пользователь - владельцем
-        if (!owners.containsKey(userId))
+    public static void isOwner(long userId, Item item) {
+        if (userId != item.getOwner())
             throw new NotFoundException(
                     String.format("пользователю ID %s не является владельцем", userId));
-        // проверяю содержится ли id вещи во множестве вещей данного пользователя-владельца
-        if (!owners.get(userId).contains(itemId))
-            throw new NotFoundException(
-                    String.format("Вещь с ID %s, принадлежащая пользователю ID %s не найдена",
-                            itemId, userId));
     }
 
     // метод валидации строки запроса
