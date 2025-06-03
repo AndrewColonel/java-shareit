@@ -3,8 +3,6 @@ package ru.practicum.shareit.item;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
 
 public interface ItemRepository {
     Item save(long userId, Item item);
