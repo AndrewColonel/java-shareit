@@ -1,20 +1,24 @@
 package ru.practicum.shareit.user.model;
 
-
-import jakarta.validation.constraints.Positive;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
 
+@Entity
+@Table(name = "users")
 @Data
 @Builder
 public class User {
     // уникальный идентификатор пользователя
-    @Positive
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     // имя или логин пользователя
+    @Column(name = "name", length = 255, nullable = false)
     private String name;
     // адрес электронной почты (учтите, что два пользователя не могут
     // иметь одинаковый адрес электронной почты)
+    @Column(name = "email", length = 512, nullable = false)
     private String email;
 }
 

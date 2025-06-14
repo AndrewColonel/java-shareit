@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.dto;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
 
@@ -8,6 +9,7 @@ import lombok.Data;
 @Builder
 public class UserDto {
     // уникальный идентификатор пользователя
+    @Positive
     private long id;
     // имя или логин пользователя
     private String name;
