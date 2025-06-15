@@ -2,7 +2,7 @@ package ru.practicum.shareit.item;
 
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Objects;
@@ -20,32 +20,28 @@ public class ItemMapper {
                 .build();
     }
 
-    public static Item toItem(ItemDto itemDto) {
-        return Item.builder()
-                .id(itemDto.getId())
-                .name(itemDto.getName())
-                .description(itemDto.getDescription())
-                .available(itemDto.getAvailable())
-                .owner(itemDto.getOwner())
-                .request(Objects.nonNull(itemDto.getRequest()) ? itemDto.getRequest() : null)
-                .build();
+    public static Item toItem(long userId, ItemDto itemDto) {
+        Item item = new Item();
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setAvailable(itemDto.getAvailable());
+        item.setOwner(userId);
+        if (Objects.nonNull(itemDto.getRequest())) item.setRequest(itemDto.getRequest());
+        return item;
     }
 
-    public static Item toItem(ItemPatchDto itemPatchDto) {
+    public static Item toItem(Item oldItem, ItemPatchDto itemPatchDto) {
         // обновление полей может происходить в любой комбинации
         // название, описание и статус доступа к аренде.
-        return Item.builder()
-                .name(Objects.nonNull(itemPatchDto.getName()) ?
-                        itemPatchDto.getName() : null)
-                .description(Objects.nonNull(itemPatchDto.getDescription()) ?
-                        itemPatchDto.getDescription() : null)
-                .available(Objects.nonNull(itemPatchDto.getAvailable()) ?
-                        itemPatchDto.getAvailable() : null)
-                .build();
+        Item item = new Item();
+        if (Objects.nonNull(itemPatchDto.getName())) item.setName(itemPatchDto.getName());
+        if (Objects.nonNull(itemPatchDto.getDescription())) item.setDescription(itemPatchDto.getDescription());
+        if (Objects.nonNull(itemPatchDto.getAvailable())) item.setAvailable(itemPatchDto.getAvailable());
+        return item;
     }
 
-    public static ItemRequestDto toItemRequestDto(Item item) {
-        return ItemRequestDto.builder()
+    public static ItemOwnerRequestDto toItemRequestDto(Item item) {
+        return ItemOwnerRequestDto.builder()
                 .name(item.getName())
                 .description(item.getDescription())
                 .build();

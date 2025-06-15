@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ItemRequestDto {
+public class ItemOwnerRequestDto {
     // модель для Просмотр владельцем списка всех
     // его вещей с указанием названия и описания для каждой из них
     // краткое название

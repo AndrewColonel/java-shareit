@@ -30,8 +30,8 @@ public class ItemCheck {
     }
 
     // метод валидации пользователя как владельца конкретной вещи
-    public static void isOwner(long userId, Item item) {
-        if (userId != item.getOwner())
+    public static void isOwner(long userId, long ownerId) {
+        if (userId != ownerId)
             throw new NotFoundException(
                     String.format("пользователю ID %s не является владельцем", userId));
     }

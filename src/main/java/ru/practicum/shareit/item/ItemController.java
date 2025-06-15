@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
 
 import java.util.Collection;
 
@@ -36,7 +36,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public Collection<ItemRequestDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemOwnerRequestDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.findAllItems(userId);
     }
 
