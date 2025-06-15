@@ -1,24 +1,15 @@
 package ru.practicum.shareit.user.dto;
-
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class UserDto {
-    // уникальный идентификатор пользователя
-    private long id;
+public class UserPatchDto {
     // имя или логин пользователя
-    @NotBlank
-    @NotNull
     private String name;
     // адрес электронной почты (учтите, что два пользователя не могут
     // иметь одинаковый адрес электронной почты)
     @Email
-    @NotBlank
-    @NotNull
     private String email;
 }

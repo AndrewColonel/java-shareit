@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserPatchDto;
 
 import java.util.Collection;
 
@@ -34,8 +35,8 @@ public class UserController {
 
     @PatchMapping("/{id}")
     public UserDto update(@Positive @PathVariable("id") long id,
-                          @Valid @RequestBody UserDto userDto) {
-        return userService.updateUser(id, userDto);
+                          @Valid @RequestBody UserPatchDto userPatchDto) {
+        return userService.updateUser(id, userPatchDto);
     }
 
     @DeleteMapping("/{id}")
