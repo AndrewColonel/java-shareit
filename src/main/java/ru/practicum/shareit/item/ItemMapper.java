@@ -33,14 +33,13 @@ public class ItemMapper {
     public static Item toItem(Item oldItem, ItemPatchDto itemPatchDto) {
         // обновление полей может происходить в любой комбинации
         // название, описание и статус доступа к аренде.
-        Item item = new Item();
-        if (Objects.nonNull(itemPatchDto.getName())) item.setName(itemPatchDto.getName());
-        if (Objects.nonNull(itemPatchDto.getDescription())) item.setDescription(itemPatchDto.getDescription());
-        if (Objects.nonNull(itemPatchDto.getAvailable())) item.setAvailable(itemPatchDto.getAvailable());
-        return item;
+        if (Objects.nonNull(itemPatchDto.getName())) oldItem.setName(itemPatchDto.getName());
+        if (Objects.nonNull(itemPatchDto.getDescription())) oldItem.setDescription(itemPatchDto.getDescription());
+        if (Objects.nonNull(itemPatchDto.getAvailable())) oldItem.setAvailable(itemPatchDto.getAvailable());
+        return oldItem;
     }
 
-    public static ItemOwnerRequestDto toItemRequestDto(Item item) {
+    public static ItemOwnerRequestDto toItemOwnerRequestDto(Item item) {
         return ItemOwnerRequestDto.builder()
                 .name(item.getName())
                 .description(item.getDescription())

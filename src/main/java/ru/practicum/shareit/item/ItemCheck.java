@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.model.Item;
 
 import java.util.Objects;
 
@@ -33,7 +32,7 @@ public class ItemCheck {
     public static void isOwner(long userId, long ownerId) {
         if (userId != ownerId)
             throw new NotFoundException(
-                    String.format("пользователю ID %s не является владельцем", userId));
+                    String.format("Пользователь с ID %s не является владельцем", userId));
     }
 
     // метод валидации строки запроса

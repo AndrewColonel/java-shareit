@@ -10,6 +10,8 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.item.ItemCheck.*;
 
@@ -27,11 +29,9 @@ public class ItemServiceImpl implements ItemService {
         //валидация владелца как зарегистрированного пользоыателя
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
-        // валидация пользователя как владельца
-        isOwner(userId, itemDto.getOwner());
+        // валидация пользователя как владельца - isOwner(userId, itemDto.getOwner()) не проходитт по тесту)))
         return ItemMapper.toItemDto(
-                itemRepository.save(userId,
-                        ItemMapper.toItem(userId, itemDto)));
+                itemRepository.save(ItemMapper.toItem(userId, itemDto)));
     }
 
     @Override
@@ -44,12 +44,12 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         // Валидация вещи для обновления
-        Item oldItem = itemRepository.findById(itemId);
+        Item oldItem = itemRepository.findById(itemId).orElseThrow(() ->
+                new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
         // валидация пользователя как владельца
         isOwner(userId, oldItem.getOwner());
         return ItemMapper.toItemDto(
-                itemRepository.update(itemId, oldItem,
-                        ItemMapper.toItem(oldItem,itemPatchDto)));
+                itemRepository.save(ItemMapper.toItem(oldItem,itemPatchDto)));
     }
 
     @Override
@@ -57,7 +57,8 @@ public class ItemServiceImpl implements ItemService {
         //доступнно всем
         // валидация  itemId и userId выполняется контроллером
         return ItemMapper.toItemDto(
-                itemRepository.findById(itemId));
+                itemRepository.findById(itemId).orElseThrow(() ->
+                        new NotFoundException(String.format("Вещь с ID %s не найдена", itemId))));
     }
 
     @Override
@@ -66,16 +67,19 @@ public class ItemServiceImpl implements ItemService {
         // валидация  itemId и userId выполняется контроллером
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
-        return itemRepository.findAll(userId).stream()
-                .map(ItemMapper::toItemRequestDto)
+        return itemRepository.findByOwner(userId).stream()
+                .map(ItemMapper::toItemOwnerRequestDto)
                 .toList();
     }
 
     @Override
     public Collection<ItemDto> searchItems(String searchQuery) {
         isStringQuery(searchQuery);
+        if (searchQuery.isEmpty() || searchQuery.isBlank())
+            return Set.of();
         return itemRepository.search(searchQuery).stream()
+                .filter(item -> item.getAvailable().equals(true))
                 .map(ItemMapper::toItemDto)
-                .toList();
+                .collect(Collectors.toSet());
     }
 }

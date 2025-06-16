@@ -24,7 +24,7 @@ public class Item {
     @Column(name = "is_available")
     private Boolean available;
     // владелец вещи
-    @Column(name = "ownwe_id")
+    @Column(name = "owner_id")
     private long owner;
     // если вещь была создана по запросу другого пользователя, то в этом
     //поле будет храниться ссылка на соответствующий запрос
