@@ -8,7 +8,6 @@ import java.util.Objects;
 
 public class ItemCheck {
 
-
     // метод валидации поля id пользователя
     public static void isGetId(long id) {
         if (id < 1) throw new ValidationException(
@@ -32,7 +31,8 @@ public class ItemCheck {
     public static void isOwner(long userId, long ownerId) {
         if (userId != ownerId)
             throw new NotFoundException(
-                    String.format("Пользователь с ID %s не является владельцем", userId));
+                    String.format("Пользователь с ID %s не является владельцем вещи c ID влдаельца %s",
+                            userId, ownerId));
     }
 
     // метод валидации строки запроса
@@ -40,4 +40,5 @@ public class ItemCheck {
         if (Objects.isNull(searchQuery))
             throw new ValidationException(String.format("Запрос %s не прошел валидацию", searchQuery));
     }
+
 }

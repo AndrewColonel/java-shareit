@@ -30,8 +30,9 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         // валидация пользователя как владельца - isOwner(userId, itemDto.getOwner()) не проходитт по тесту)))
+        itemDto.setOwner(userId);
         return ItemMapper.toItemDto(
-                itemRepository.save(ItemMapper.toItem(userId, itemDto)));
+                itemRepository.save(ItemMapper.toItem(itemDto)));
     }
 
     @Override
