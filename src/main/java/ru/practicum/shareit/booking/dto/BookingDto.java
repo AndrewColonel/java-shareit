@@ -23,7 +23,6 @@ public class BookingDto {
     @FutureOrPresent
     private LocalDateTime end;
     // вещь, которую пользователь бронирует
-    @NotNull
     @Positive
     private long itemId;
     //пользователь, который осуществляет бронирование
