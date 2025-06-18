@@ -31,7 +31,7 @@ public class ItemCheck {
     // метод валидации пользователя как владельца конкретной вещи
     public static void isOwner(long userId, long ownerId) {
         if (userId != ownerId)
-            throw new NotFoundException(
+            throw new ValidationException(
                     String.format("Пользователь с ID %s не является владельцем вещи c ID влдаельца %s",
                             userId, ownerId));
     }

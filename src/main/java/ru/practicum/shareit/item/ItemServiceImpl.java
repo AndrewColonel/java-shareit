@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.item.ItemCheck.*;
 
-
 @Service
 @AllArgsConstructor
 public class ItemServiceImpl implements ItemService {
