@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
+import ru.practicum.shareit.item.dto.NewItemDto;
 
 import java.util.Collection;
 
@@ -19,8 +20,8 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
-                          @Valid @RequestBody ItemDto itemDto) {
-        return itemService.createItem(userId, itemDto);
+                          @Valid @RequestBody NewItemDto newItemDto) {
+        return itemService.createItem(userId, newItemDto);
     }
 
     @PatchMapping("/{itemId}")

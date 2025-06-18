@@ -6,6 +6,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
+import ru.practicum.shareit.item.dto.NewItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -24,15 +25,15 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     @Override
-    public ItemDto createItem(long userId, ItemDto itemDto) {
+    public ItemDto createItem(long userId, NewItemDto newItemDto) {
         // валидация  userDto и userId выполняется контроллером
         //валидация владелца как зарегистрированного пользоыателя
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         // валидация пользователя как владельца - isOwner(userId, itemDto.getOwner()) не проходитт по тесту)))
-        itemDto.setOwner(userId);
+        newItemDto.setOwner(userId);
         return ItemMapper.toItemDto(
-                itemRepository.save(ItemMapper.toItem(itemDto)));
+                itemRepository.save(ItemMapper.toItem(newItemDto)));
     }
 
     @Override

@@ -3,6 +3,7 @@ package ru.practicum.shareit.user;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.NewUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserPatchDto;
 import ru.practicum.shareit.user.model.User;
@@ -18,9 +19,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDto createUser(UserDto userDto) {
+    public UserDto createUser(NewUserDto newUserDto) {
         return UserMapper.toUserDto(
-                userRepository.save(UserMapper.toUser(userDto)));
+                userRepository.save(UserMapper.toUser(newUserDto)));
     }
 
     @Override

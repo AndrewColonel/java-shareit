@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
+import ru.practicum.shareit.item.dto.NewItemDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Objects;
@@ -22,13 +23,13 @@ public class ItemMapper {
                 .build();
     }
 
-    public static Item toItem(ItemDto itemDto) {
+    public static Item toItem(NewItemDto newItemDto) {
         Item item = new Item();
-        item.setName(itemDto.getName());
-        item.setDescription(itemDto.getDescription());
-        item.setAvailable(itemDto.getAvailable());
-        item.setOwner(itemDto.getOwner());
-        if (Objects.nonNull(itemDto.getRequest())) item.setRequest(itemDto.getRequest());
+        item.setName(newItemDto.getName());
+        item.setDescription(newItemDto.getDescription());
+        item.setAvailable(newItemDto.getAvailable());
+        item.setOwner(newItemDto.getOwner());
+        if (Objects.nonNull(newItemDto.getRequest())) item.setRequest(newItemDto.getRequest());
         return item;
     }
 

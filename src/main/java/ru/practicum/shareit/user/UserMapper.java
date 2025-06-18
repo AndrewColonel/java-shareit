@@ -2,6 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.user.dto.NewUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserPatchDto;
 import ru.practicum.shareit.user.model.User;
@@ -19,12 +20,12 @@ public class UserMapper {
                 .build();
     }
 
-    public static User toUser(UserDto userDto) {
+    public static User toUser(NewUserDto newUserDto) {
         User user = new User();
-        user.setId(userDto.getId());
+        user.setId(newUserDto.getId());
         // при создании пользователя валидация данных полей будет выполнена аннотациями
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
+        user.setName(newUserDto.getName());
+        user.setEmail(newUserDto.getEmail());
         return user;
     }
 
