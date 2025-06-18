@@ -9,6 +9,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 
@@ -30,14 +31,14 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto createBooking(long userId, NewBookingDto newBookingDto ) {
         isStartEndValid(newBookingDto);
-        userRepository.findById(userId).orElseThrow(() ->
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         Item item = itemRepository.findById(newBookingDto.getItemId()).orElseThrow(() ->
                 new NotFoundException(String.format("Вещь с ID %s не найдена", newBookingDto.getItemId())));
         isItemAvailable(item);
         newBookingDto.setBooker(userId);
         newBookingDto.setStatus(Status.WAITING);
-        return toBookingDto(bookingRepository.save(toBooking(newBookingDto)));
+        return toBookingDto(bookingRepository.save(toBooking(newBookingDto)),user, item);
     }
 
     //- Подтверждение или отклонение запроса на бронирование. Может быть выполнено только владельцем вещи.
@@ -46,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
     // параметр `approved` может принимать значения `true` или `false`.
     @Override
     public BookingDto updateBooking(long userId, long bookingId, boolean approved) {
-        userRepository.findById(userId).orElseThrow(() ->
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException(String.format("Бронирования  с ID %s не найден", bookingId)));
@@ -54,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundException(String.format("Вещь с ID %s не найдена", booking.getItem())));
         isOwner(userId, item.getOwner());
         booking.setStatus(approved ? Status.APPROVED : Status.REJECTED);
-        return toBookingDto(bookingRepository.save(booking));
+        return toBookingDto(bookingRepository.save(booking),user,item);
     }
 
     //- Получение данных о конкретном бронировании (включая его статус).
@@ -63,7 +64,7 @@ public class BookingServiceImpl implements BookingService {
     // Эндпоинт — `GET /bookings/{bookingId}`.
     @Override
     public BookingDto getBookingById(long userId, long bookingId) {
-        userRepository.findById(userId).orElseThrow(() ->
+        User user = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException(String.format("Бронирования  с ID %s не найден", bookingId)));
@@ -71,7 +72,7 @@ public class BookingServiceImpl implements BookingService {
                 new NotFoundException(String.format("Вещь с ID %s не найдена", booking.getItem())));
         isOwner(userId, item.getOwner());
         isBooker(userId, booking.getBooker());
-        return toBookingDto(booking);
+        return toBookingDto(booking,user,item);
     }
 
     //- Получение списка всех бронирований текущего пользователя.

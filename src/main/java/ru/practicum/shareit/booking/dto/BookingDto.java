@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.dto;
 import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
 import java.time.LocalDateTime;
 
@@ -16,9 +18,9 @@ public class BookingDto {
     //дата и время конца бронирования
     private LocalDateTime end;
     // вещь, которую пользователь бронирует
-    private long item;
+    private ItemDto item;
     //пользователь, который осуществляет бронирование
-    private long booker;
+    private UserDto booker;
     // статус бронирования. Может принимать одно из следующихзначений:
     // WAITING — новое бронирование, ожидает одобрения,
     // APPROVED — бронирование подтверждено владельцем,
