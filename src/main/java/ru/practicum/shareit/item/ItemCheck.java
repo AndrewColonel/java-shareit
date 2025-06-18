@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.model.Item;
 
 import java.util.Objects;
 
@@ -39,6 +40,12 @@ public class ItemCheck {
     public static void isStringQuery(String searchQuery) {
         if (Objects.isNull(searchQuery))
             throw new ValidationException(String.format("Запрос %s не прошел валидацию", searchQuery));
+    }
+
+    // метод валидации доступности вещи
+    public static void isItemAvailable(Item item) {
+        if (item.getAvailable().equals(false))
+            throw new ValidationException(String.format("Вещь %s для заказа недоступна", item.getId()));
     }
 
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.NewBookingDto;
 
 import java.util.Collection;
 
@@ -19,9 +20,9 @@ public class BookingController {
     // `WAITING` — «ожидает подтверждения».
     @PostMapping
     public BookingDto create(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
-                             @Valid @RequestBody BookingDto bookingDto) {
+                             @Valid @RequestBody NewBookingDto newBookingDto) {
 
-        return bookingService.createBooking(userId, bookingDto);
+        return bookingService.createBooking(userId, newBookingDto);
     }
 
     // Эндпоинт — `PATCH /bookings/{bookingId}?approved={approved}`,
@@ -29,7 +30,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDto update(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                              @Positive @PathVariable("bookingId") long bookingId,
-                             @RequestParam(name = "approved", required = true) boolean approved) {
+                             @RequestParam(name = "approved") boolean approved) {
         return bookingService.updateBooking(userId, bookingId, approved);
     }
 
@@ -45,7 +46,7 @@ public class BookingController {
     @GetMapping
     public Collection<BookingDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                           @Positive @RequestParam(name = "state", required = false,
-                                                  defaultValue = "ALL") String state) {
+                                                  defaultValue = "ALL") State state) {
         return bookingService.findAllBookings(userId, state);
     }
 
@@ -54,7 +55,7 @@ public class BookingController {
     @GetMapping("/owner")
     public Collection<BookingDto> findAllByOwner(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                                  @Positive @RequestParam(name = "state", required = false,
-                                                         defaultValue = "ALL") String state) {
+                                                         defaultValue = "ALL") State state) {
         return bookingService.findAllOwnerBooking(userId, state);
     }
 

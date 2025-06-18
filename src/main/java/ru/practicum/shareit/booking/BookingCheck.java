@@ -1,18 +1,18 @@
 package ru.practicum.shareit.booking;
 
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 
 public class BookingCheck {
 
     // метод валидации BookingDto
-    public static void isStartEndValid(BookingDto bookingDto) {
-        if (bookingDto.getStart().isAfter(bookingDto.getEnd())
-                || bookingDto.getStart().isEqual(bookingDto.getEnd()))
+    public static void isStartEndValid(NewBookingDto newBookingDto) {
+        if (newBookingDto.getStart().isAfter(newBookingDto.getEnd())
+                || newBookingDto.getStart().isEqual(newBookingDto.getEnd()))
             throw new ValidationException(String.format("Неверно указаны даты аренды." +
-                    "Дата начала аренды %s наступает после даты конца %s аренды",
-                    bookingDto.getStart(), bookingDto.getEnd()));
+                    "Дата начала аренды %s наступает после или одновременно с датой конца %s аренды",
+                    newBookingDto.getStart(), newBookingDto.getEnd()));
 
     }
 

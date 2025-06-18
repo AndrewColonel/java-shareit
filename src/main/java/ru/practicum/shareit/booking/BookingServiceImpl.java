@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.ItemRepository;
@@ -27,15 +28,16 @@ public class BookingServiceImpl implements BookingService {
     // а затем подтверждён владельцем вещи.
     // Эндпоинт — `POST /bookings` После создания запрос находится в статусе `WAITING` — «ожидает подтверждения».
     @Override
-    public BookingDto createBooking(long userId, BookingDto bookingDto) {
-        isStartEndValid(bookingDto);
+    public BookingDto createBooking(long userId, NewBookingDto newBookingDto ) {
+        isStartEndValid(newBookingDto);
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
-        itemRepository.findById(bookingDto.getItemId()).orElseThrow(() ->
-                new NotFoundException(String.format("Вещь с ID %s не найдена", bookingDto.getItemId())));
-        bookingDto.setBooker(userId);
-        bookingDto.setStatus(Status.WAITING);
-        return toBookingDto(bookingRepository.save(toBooking(bookingDto)));
+        Item item = itemRepository.findById(newBookingDto.getItemId()).orElseThrow(() ->
+                new NotFoundException(String.format("Вещь с ID %s не найдена", newBookingDto.getItemId())));
+        isItemAvailable(item);
+        newBookingDto.setBooker(userId);
+        newBookingDto.setStatus(Status.WAITING);
+        return toBookingDto(bookingRepository.save(toBooking(newBookingDto)));
     }
 
     //- Подтверждение или отклонение запроса на бронирование. Может быть выполнено только владельцем вещи.
@@ -80,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
     // **`REJECTED`** (англ. «отклонённые»).
     // Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
     @Override
-    public Collection<BookingDto> findAllBookings(long userId, String state) {
+    public Collection<BookingDto> findAllBookings(long userId, State state) {
         return null;
     }
 
@@ -88,7 +90,7 @@ public class BookingServiceImpl implements BookingService {
     // Эндпоинт — `GET /bookings/owner?state={state}`. Этот запрос имеет смысл для владельца хотя бы одной вещи.
     // Работа параметра `state` аналогична его работе в предыдущем сценарии.
     @Override
-    public Collection<BookingDto> findAllOwnerBooking(long userId, String state) {
+    public Collection<BookingDto> findAllOwnerBooking(long userId, State state) {
         return null;
     }
 
