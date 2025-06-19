@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingOwnerRequestDto;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -12,7 +13,6 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
-import java.util.List;
 
 import static ru.practicum.shareit.booking.BookingCheck.*;
 import static ru.practicum.shareit.booking.BookingMapper.*;
@@ -62,30 +62,52 @@ public class BookingServiceImpl implements BookingService {
         return toBookingDto(booking);
     }
 
-    //- Получение списка всех бронирований текущего пользователя.
+    // Получение списка всех бронирований текущего пользователя.
     // Эндпоинт — `GET /bookings?state={state}`.
-    // Параметр `state` необязательный и по умолчанию равен **`ALL`** (англ. «все»).
-    // Также он может принимать значения **`CURRENT`** (англ. «текущие»), **`PAST`** (англ. «завершённые»),
-    // **`FUTURE`** (англ. «будущие»), **`WAITING`** (англ. «ожидающие подтверждения»),
-    // **`REJECTED`** (англ. «отклонённые»).
+    // Параметр `state` необязательный и по умолчанию равен ALL  -все
+    // Также он может принимать значения^
+    // CURRENT - «текущие»
+    // PAST - «завершённые»
+    // FUTURE - «будущие»
+    // WAITING - «ожидающие подтверждения»
+    // REJECTED - «отклонённые»
     // Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
     @Override
-    public Collection<BookingDto> findAllBookings(long userId, State state) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
+    public Collection<BookingOwnerRequestDto> findAllBookings(long userId, State state) {
+        userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
+       if (state.equals(State.ALL)) {
+           return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
+                   .map(BookingMapper::toBookingOwnerRequestDto)
+                   .toList();
+       } else {
+           return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
+                   .map(BookingMapper::toBookingOwnerRequestDto)
+                   .filter(bookingOwnerRequestDto -> bookingOwnerRequestDto.getStatus().equals(state))
+                   .toList();
+       }
 
-//        return bookingRepository.findByBooker(userId).stream()
-//                .map(BookingMapper::toBookingDto)
-//                .toList();
-        return List.of();
     }
 
-    //- Получение списка бронирований для всех вещей текущего пользователя.
+    // Получение списка бронирований для всех вещей текущего пользователя.
     // Эндпоинт — `GET /bookings/owner?state={state}`. Этот запрос имеет смысл для владельца хотя бы одной вещи.
     // Работа параметра `state` аналогична его работе в предыдущем сценарии.
     @Override
-    public Collection<BookingDto> findAllOwnerBooking(long userId, State state) {
-        return List.of();
+    public Collection<BookingOwnerRequestDto> findAllOwnerBooking(long userId, State state) {
+        userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
+        if (state.equals(State.ALL)) {
+            return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
+                    .filter(booking -> booking.getItem().getOwner() == userId)
+                    .map(BookingMapper::toBookingOwnerRequestDto)
+                    .toList();
+        } else {
+            return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
+                    .filter(booking -> booking.getItem().getOwner() == userId)
+                    .map(BookingMapper::toBookingOwnerRequestDto)
+                    .filter(bookingOwnerRequestDto -> bookingOwnerRequestDto.getStatus().equals(state))
+                    .toList();
+        }
     }
 
 }
