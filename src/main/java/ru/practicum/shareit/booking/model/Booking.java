@@ -3,6 +3,8 @@ package ru.practicum.shareit.booking.model;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
@@ -22,12 +24,14 @@ public class Booking {
     //дата и время конца бронирования
     @Column(name = "end_date")
     private LocalDateTime end;
-    // вещь, которую пользователь бронирует
-    @Column(name = "item_id")
-    private long item;
     //пользователь, который осуществляет бронирование
-    @Column(name = "booker_id")
-    private long booker;
+    @ManyToOne
+    @JoinColumn(name = "booker_id")
+    private User booker;
+    // вещь, которую пользователь бронирует
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
     // статус бронирования. Может принимать одно из следующихзначений:
     // WAITING — новое бронирование, ожидает одобрения,
     // APPROVED — бронирование подтверждено владельцем,
@@ -36,4 +40,6 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 15)
     private Status status;
+
+
 }

@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.booking.Status;
 
 import java.time.LocalDateTime;
 
@@ -23,12 +22,4 @@ public class NewBookingDto {
     // вещь, которую пользователь бронирует
     @Positive
     private long itemId;
-    //пользователь, который осуществляет бронирование
-    private long booker;
-    // статус бронирования. Может принимать одно из следующихзначений:
-    // WAITING — новое бронирование, ожидает одобрения,
-    // APPROVED — бронирование подтверждено владельцем,
-    // REJECTED — бронирование отклонено владельцем,
-    // CANCELED — бронирование отменено создателем.
-    private Status status;
 }

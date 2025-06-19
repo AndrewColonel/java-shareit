@@ -14,26 +14,25 @@ import static ru.practicum.shareit.user.UserMapper.toUserDto;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BookingMapper {
 
-    public static Booking toBooking(NewBookingDto newBookingDto) {
+    public static Booking toBooking(NewBookingDto newBookingDto, User booker, Item item) {
         Booking booking = new Booking();
         booking.setStart(newBookingDto.getStart());
         booking.setEnd(newBookingDto.getEnd());
-        booking.setItem(newBookingDto.getItemId());
-        booking.setBooker(newBookingDto.getBooker());
-        booking.setStatus(newBookingDto.getStatus());
+        booking.setItem(item);
+        booking.setBooker(booker);
+        booking.setStatus(Status.WAITING);
         return booking;
     }
 
-    public static BookingDto toBookingDto(Booking booking, User user, Item item) {
+    public static BookingDto toBookingDto(Booking booking) {
         return BookingDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
-                .item(toItemDto(item))
-                .booker(toUserDto(user))
+                .item(toItemDto(booking.getItem()))
+                .booker(toUserDto(booking.getBooker()))
                 .status(booking.getStatus())
                 .build();
     }
-
 
 }

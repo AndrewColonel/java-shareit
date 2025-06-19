@@ -6,7 +6,6 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
@@ -32,50 +31,35 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto createBooking(long userId, NewBookingDto newBookingDto) {
         isStartEndValid(newBookingDto); // валидация старта и конца брони
         // проверяем существоание такого пользователя
-        User user = userRepository.findById(userId).orElseThrow(() ->
+        User booker = userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         // проверяем существование вещи
         Item item = itemRepository.findById(newBookingDto.getItemId()).orElseThrow(() ->
                 new NotFoundException(String.format("Вещь с ID %s не найдена", newBookingDto.getItemId())));
-        isItemAvailable(item); // проверка доступности вещи для брони
-        newBookingDto.setBooker(userId);
-        newBookingDto.setStatus(Status.WAITING);
-        return toBookingDto(bookingRepository.save(toBooking(newBookingDto)), user, item);
+        // проверка доступности вещи для брони
+        isItemAvailable(item);
+        return toBookingDto(bookingRepository.save(toBooking(newBookingDto, booker, item)));
     }
 
     // Подтверждение или отклонение запроса на бронирование.
     @Override
     public BookingDto updateBooking(long userId, long bookingId, boolean approved) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new ValidationException(String.format("Пользователь с ID %s не найден", userId)));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException(String.format("Бронирования  с ID %s не найден", bookingId)));
-        Item item = itemRepository.findById(booking.getItem()).orElseThrow(() ->
-                new NotFoundException(String.format("Вещь с ID %s не найдена", booking.getItem())));
-        isOwner(userId, item.getOwner()); // Может быть выполнено только владельцем вещи.
-        // необходимо получить пользователя запрошивающего бронь
-        User booker = userRepository.findById(booking.getBooker()).orElseThrow(() ->
-                new ValidationException(String.format("Пользователь с ID %s не найден", userId)));
-        // Затем статус бронирования становится либо `APPROVED`,либо `REJECTED`
+        // Может быть выполнено только владельцем вещи.
+        isOwner(userId, booking.getItem().getOwner());
         booking.setStatus(approved ? Status.APPROVED : Status.REJECTED);
-        return toBookingDto(bookingRepository.save(booking), booker, item);
+        return toBookingDto(bookingRepository.save(booking));
     }
 
     // Получение данных о конкретном бронировании (включая его статус).
     @Override
     public BookingDto getBookingById(long userId, long bookingId) {
-        User user = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() ->
                 new NotFoundException(String.format("Бронирования  с ID %s не найден", bookingId)));
-        Item item = itemRepository.findById(booking.getItem()).orElseThrow(() ->
-                new NotFoundException(String.format("Вещь с ID %s не найдена", booking.getItem())));
         // Может быть выполнено либо автором бронирования, либо владельцем вещи,к которой относится бронирование.
-        isBookerOrOwner(userId, booking.getBooker(), item.getOwner());
-        // необходимо получить пользователя запрошивающего бронь
-        User booker = userRepository.findById(booking.getBooker()).orElseThrow(() ->
-                new ValidationException(String.format("Пользователь с ID %s не найден", userId)));
-        return toBookingDto(booking, booker, item);
+        isBookerOrOwner(userId, booking.getBooker().getId(), booking.getItem().getOwner());
+        return toBookingDto(booking);
     }
 
     //- Получение списка всех бронирований текущего пользователя.
@@ -87,6 +71,12 @@ public class BookingServiceImpl implements BookingService {
     // Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
     @Override
     public Collection<BookingDto> findAllBookings(long userId, State state) {
+        User user = userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
+
+//        return bookingRepository.findByBooker(userId).stream()
+//                .map(BookingMapper::toBookingDto)
+//                .toList();
         return List.of();
     }
 
