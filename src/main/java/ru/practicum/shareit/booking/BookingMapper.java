@@ -39,6 +39,7 @@ public class BookingMapper {
     }
 
     public static BookingOwnerRequestDto toBookingOwnerRequestDto(Booking booking) {
+
         BookingOwnerRequestDto bookingOwnerRequestDto = BookingOwnerRequestDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
@@ -46,6 +47,7 @@ public class BookingMapper {
                 .item(toItemDto(booking.getItem()))
                 .booker(toUserDto(booking.getBooker()))
                 .build();
+
         if (booking.getStatus().equals(Status.CANCELED) || booking.getStatus().equals(Status.REJECTED))
             bookingOwnerRequestDto.setStatus(State.REJECTED);
         if (booking.getStatus().equals(Status.APPROVED) && (booking.getStart().isAfter(LocalDateTime.now())))
@@ -61,6 +63,5 @@ public class BookingMapper {
 
         return bookingOwnerRequestDto;
     }
-
 
 }

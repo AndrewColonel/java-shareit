@@ -4,9 +4,11 @@ import lombok.Builder;
 import lombok.Data;
 import ru.practicum.shareit.request.model.ItemRequest;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
-public class ItemDto {
+public class ItemViewingDto {
     // уникальный идентификатор вещи
     private long id;
     // краткое название
@@ -20,5 +22,8 @@ public class ItemDto {
     // если вещь была создана по запросу другого пользователя, то в этом
     //поле будет храниться ссылка на соответствующий запрос
     private ItemRequest request;
+    private LocalDateTime lastBooking;
+    private LocalDateTime nextBooking;
+    private String comments;
 
 }

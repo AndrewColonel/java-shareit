@@ -4,10 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
-import ru.practicum.shareit.item.dto.NewItemDto;
+import ru.practicum.shareit.item.dto.*;
 
 import java.util.Collection;
 
@@ -32,12 +29,12 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@Positive @PathVariable("itemId") long itemId) {
+    public ItemViewingDto getById(@Positive @PathVariable("itemId") long itemId) {
         return itemService.getItemById(itemId);
     }
 
     @GetMapping
-    public Collection<ItemOwnerRequestDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemOwnerViewingDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.findAllItems(userId);
     }
 

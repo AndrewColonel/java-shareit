@@ -2,10 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
-import ru.practicum.shareit.item.dto.NewItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Objects;
@@ -42,10 +39,21 @@ public class ItemMapper {
         return oldItem;
     }
 
-    public static ItemOwnerRequestDto toItemOwnerRequestDto(Item item) {
-        return ItemOwnerRequestDto.builder()
+    public static ItemOwnerViewingDto toItemOwnerRequestDto(Item item) {
+        return ItemOwnerViewingDto.builder()
                 .name(item.getName())
                 .description(item.getDescription())
+                .build();
+    }
+
+    public static ItemViewingDto toItemViewingDto(Item item) {
+        return ItemViewingDto.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .description(item.getDescription())
+                .available(item.getAvailable())
+                .owner(item.getOwner())
+                .request(Objects.nonNull(item.getRequest()) ? item.getRequest() : null)
                 .build();
     }
 

@@ -3,10 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.dto.ItemOwnerRequestDto;
-import ru.practicum.shareit.item.dto.NewItemDto;
+import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -54,16 +51,16 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto getItemById(long itemId) {
+    public ItemViewingDto getItemById(long itemId) {
         //доступнно всем
         // валидация  itemId и userId выполняется контроллером
-        return ItemMapper.toItemDto(
+        return ItemMapper.toItemViewingDto(
                 itemRepository.findById(itemId).orElseThrow(() ->
                         new NotFoundException(String.format("Вещь с ID %s не найдена", itemId))));
     }
 
     @Override
-    public Collection<ItemOwnerRequestDto> findAllItems(long userId) {
+    public Collection<ItemOwnerViewingDto> findAllItems(long userId) {
         // доступно только зарегисритрованному владельцу
         // валидация  itemId и userId выполняется контроллером
         userRepository.findById(userId).orElseThrow(() ->
@@ -83,4 +80,5 @@ public class ItemServiceImpl implements ItemService {
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toSet());
     }
+
 }
