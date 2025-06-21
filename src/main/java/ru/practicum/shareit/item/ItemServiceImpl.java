@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
@@ -19,6 +20,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     public ItemDto createItem(long userId, NewItemDto newItemDto) {
@@ -51,7 +53,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemViewingDto getItemById(long itemId) {
+    public ItemViewingDto getItemById(long userId, long itemId) {
         //доступнно всем
         // валидация  itemId и userId выполняется контроллером
         return ItemMapper.toItemViewingDto(
