@@ -41,7 +41,7 @@ public class CheckUtility {
 
     // метод валидации пользователя как владельца конкретной вещи
     public static boolean isOwnerBoolean(long userId, long ownerId) {
-       return userId != ownerId;
+       return userId == ownerId;
     }
 
     // метод валидации строки запроса

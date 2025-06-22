@@ -7,6 +7,7 @@ import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
 
@@ -44,6 +45,17 @@ public class ItemMapper {
         return ItemOwnerViewingDto.builder()
                 .name(item.getName())
                 .description(item.getDescription())
+                .build();
+    }
+
+    public static ItemOwnerViewingDto toItemOwnerRequestDtoV2(Item item,
+                                                              LocalDateTime lastBooking, LocalDateTime nextBooking) {
+        return ItemOwnerViewingDto.builder()
+                .name(item.getName())
+                .description(item.getDescription())
+                .request(Objects.nonNull(item.getRequest()) ? item.getRequest() : null)
+                .lastBooking(lastBooking)
+                .nextBooking(nextBooking)
                 .build();
     }
 

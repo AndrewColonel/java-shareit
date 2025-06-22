@@ -10,9 +10,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.practicum.shareit.common.CheckUtility.*;
@@ -57,34 +55,39 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemViewingDto getItemById(long userId, long itemId) {
-        LocalDateTime lastBooking = null;
-        LocalDateTime nextBooking = null;
         // валидация  itemId и userId
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
-        // если пользователь является владельцем, нужно чтобы
-        // видел даты последнего и ближайшего следующего бронирования для каждой вещи
+        // нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования для каждой вещи
+        LocalDateTime lastBooking = null;
+        LocalDateTime nextBooking = null;
         if (isOwnerBoolean(userId, item.getOwner())) {
-            LocalDateTime requestTime = LocalDateTime.now();
-            List<Booking> booking =
-                    bookingRepository.findByBooker_IdAndEndIsBeforeOrderByEndAsc(userId, requestTime);
-            lastBooking = booking.isEmpty() ? null : booking.getLast().getEnd();
-            booking = bookingRepository.findByBooker_IdAndStartIsAfterOrderByEndAsc(userId, requestTime);
-            nextBooking = booking.isEmpty() ? null : booking.getLast().getEnd();
+            if (getBookingDateTime(itemId).get("last").isPresent())
+                lastBooking = getBookingDateTime(itemId).get("last").get();
+            if (getBookingDateTime(itemId).get("next").isPresent())
+                nextBooking = getBookingDateTime(itemId).get("next").get();
         }
         return ItemMapper.toItemViewingDto(item, lastBooking, nextBooking);
     }
 
     @Override
     public Collection<ItemOwnerViewingDto> findAllItems(long userId) {
-        // нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования
-        // для каждой вещи, когда просматривает список (`GET /items`).
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         return itemRepository.findByOwner(userId).stream()
-                .map(ItemMapper::toItemOwnerRequestDto)
+                .map(item -> {
+                    // нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования
+                    // для каждой вещи когда просматривает список (`GET /items`).
+                    LocalDateTime lastBooking = null;
+                    LocalDateTime nextBooking = null;
+                    if (getBookingDateTime(item.getId()).get("last").isPresent())
+                        lastBooking = getBookingDateTime(item.getId()).get("last").get();
+                    if (getBookingDateTime(item.getId()).get("next").isPresent())
+                        nextBooking = getBookingDateTime(item.getId()).get("next").get();
+                    return ItemMapper.toItemOwnerRequestDtoV2(item, lastBooking, nextBooking);
+                })
                 .toList();
     }
 
@@ -99,4 +102,15 @@ public class ItemServiceImpl implements ItemService {
                 .collect(Collectors.toSet());
     }
 
+    public Map<String, Optional<LocalDateTime>> getBookingDateTime(long itemId) {
+        LocalDateTime requestTime = LocalDateTime.now();
+        List<Booking> booking =
+                bookingRepository.findByItem_IdAndEndIsBeforeOrderByEndAsc(itemId, requestTime);
+        Optional<LocalDateTime> lastBooking = booking.isEmpty()
+                ? Optional.empty() : Optional.of(booking.getLast().getEnd());
+        booking = bookingRepository.findByItem_IdAndStartIsAfterOrderByEndAsc(itemId, requestTime);
+        Optional<LocalDateTime> nextBooking = booking.isEmpty()
+                ? Optional.empty() : Optional.of(booking.getLast().getEnd());
+        return Map.of("last", lastBooking, "next", nextBooking);
+    }
 }
