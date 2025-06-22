@@ -1,4 +1,4 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.common;
 
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.exception.ValidationException;

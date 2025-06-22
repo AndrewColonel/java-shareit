@@ -14,9 +14,9 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 
-import static ru.practicum.shareit.booking.BookingCheck.*;
+import static ru.practicum.shareit.common.CheckUtility.*;
 import static ru.practicum.shareit.booking.BookingMapper.*;
-import static ru.practicum.shareit.item.ItemCheck.*;
+
 
 @Service
 @AllArgsConstructor

@@ -1,4 +1,4 @@
-package ru.practicum.shareit.user;
+package ru.practicum.shareit.common;
 
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.exception.ValidationException;

@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
@@ -46,7 +47,7 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ItemViewingDto toItemViewingDto(Item item) {
+    public static ItemViewingDto toItemViewingDto(Item item, LocalDateTime lastBooking, LocalDateTime nextBooking) {
         return ItemViewingDto.builder()
                 .id(item.getId())
                 .name(item.getName())
@@ -54,6 +55,8 @@ public class ItemMapper {
                 .available(item.getAvailable())
                 .owner(item.getOwner())
                 .request(Objects.nonNull(item.getRequest()) ? item.getRequest() : null)
+                .lastBooking(lastBooking)
+                .nextBooking(nextBooking)
                 .build();
     }
 

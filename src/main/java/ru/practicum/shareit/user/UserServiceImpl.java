@@ -10,7 +10,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.Collection;
 
-import static ru.practicum.shareit.user.UserCheck.*;
+import static ru.practicum.shareit.common.CheckUtility.*;
 
 @Service
 @AllArgsConstructor

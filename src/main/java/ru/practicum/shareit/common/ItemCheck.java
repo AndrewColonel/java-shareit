@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item;
+package ru.practicum.shareit.common;
 
 import ru.practicum.shareit.item.dto.ItemPatchDto;
 import ru.practicum.shareit.exception.ValidationException;
