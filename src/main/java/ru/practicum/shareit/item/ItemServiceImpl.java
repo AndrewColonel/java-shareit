@@ -64,7 +64,8 @@ public class ItemServiceImpl implements ItemService {
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
-        // если пользователь является владельцем
+        // если пользователь является владельцем, нужно чтобы
+        // видел даты последнего и ближайшего следующего бронирования для каждой вещи
         if (isOwnerBoolean(userId, item.getOwner())) {
             LocalDateTime requestTime = LocalDateTime.now();
             List<Booking> booking =
@@ -78,8 +79,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemOwnerViewingDto> findAllItems(long userId) {
-        // доступно только зарегисритрованному владельцу
-        // валидация  itemId и userId выполняется контроллером
+        // нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования
+        // для каждой вещи, когда просматривает список (`GET /items`).
         userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         return itemRepository.findByOwner(userId).stream()
