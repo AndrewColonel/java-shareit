@@ -119,7 +119,6 @@ public class ItemServiceImpl implements ItemService {
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
         Item item = itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
-// TODO проверили что пользователь - бронировал эту вещь
         //Отзыв может оставить только тот пользователь, который брал эту вещь в аренду, и только после
         //окончания срока аренды.
         LocalDateTime requestTime = LocalDateTime.now();
