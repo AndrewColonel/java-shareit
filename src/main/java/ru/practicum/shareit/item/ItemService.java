@@ -15,4 +15,6 @@ public interface ItemService {
 
     Collection<ItemDto> searchItems(String searchQuery);
 
+    CommentDto createComment(long userId, long itemId, CommentDto commentDto);
+
 }

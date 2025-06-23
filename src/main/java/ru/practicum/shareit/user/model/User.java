@@ -16,7 +16,7 @@ public class User {
     private String name;
     // адрес электронной почты (учтите, что два пользователя не могут
     // иметь одинаковый адрес электронной почты)
-    @Column(name = "email", length = 512, nullable = false)
+    @Column(name = "email", length = 255, nullable = false)
     private String email;
 }
 

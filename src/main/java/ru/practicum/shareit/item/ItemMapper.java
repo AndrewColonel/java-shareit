@@ -6,6 +6,7 @@ import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -48,27 +49,26 @@ public class ItemMapper {
                 .build();
     }
 
-    public static ItemOwnerViewingDto toItemOwnerRequestDtoV2(Item item,
-                                                              LocalDateTime lastBooking, LocalDateTime nextBooking) {
+    public static ItemOwnerViewingDto toItemOwnerRequestDtoV2(
+            Item item,LocalDateTime lastBooking, LocalDateTime nextBooking) {
         return ItemOwnerViewingDto.builder()
                 .name(item.getName())
                 .description(item.getDescription())
-                .request(Objects.nonNull(item.getRequest()) ? item.getRequest() : null)
                 .lastBooking(lastBooking)
                 .nextBooking(nextBooking)
                 .build();
     }
 
-    public static ItemViewingDto toItemViewingDto(Item item, LocalDateTime lastBooking, LocalDateTime nextBooking) {
+    public static ItemViewingDto toItemViewingDto(
+            Item item, LocalDateTime lastBooking, LocalDateTime nextBooking, List<Long> commentsList) {
         return ItemViewingDto.builder()
                 .id(item.getId())
                 .name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .owner(item.getOwner())
-                .request(Objects.nonNull(item.getRequest()) ? item.getRequest() : null)
                 .lastBooking(lastBooking)
                 .nextBooking(nextBooking)
+                .comments(commentsList)
                 .build();
     }
 
