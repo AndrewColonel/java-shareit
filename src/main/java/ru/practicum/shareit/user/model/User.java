@@ -5,7 +5,9 @@ import lombok.*;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class User {
     // уникальный идентификатор пользователя
     @Id

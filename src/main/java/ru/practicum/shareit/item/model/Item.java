@@ -8,7 +8,9 @@ import ru.practicum.shareit.request.model.ItemRequest;
 
 @Entity
 @Table(name = "items")
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class Item {
     // уникальный идентификатор вещи
     @Id
