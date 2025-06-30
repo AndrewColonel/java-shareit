@@ -12,6 +12,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBooker_IdOrderByStartAsc(long bookerId);
 
+    // здесь нужен запрос не ByBooker_Id, а ByItem_Owner_Id
+
     List<Booking> findByItem_IdAndEndIsBeforeOrderByEndAsc(Long itemId, LocalDateTime end);
 
     List<Booking> findByItem_IdAndStartIsAfterOrderByEndAsc(Long itemId, LocalDateTime start);

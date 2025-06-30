@@ -108,8 +108,8 @@ public class CheckUtility {
     public static void isBookerOrOwner(long userId, long bookerId, long ownerId) {
         if ((userId != bookerId) && (userId != ownerId))
             throw new ValidationException(
-                    String.format("Пользователь с ID %s не является ни автором бронирования с ID %s, " +
-                                    "ни владельцем вещи c ID влдаельца %s",
+                    String.format("Пользователь с ID %s не является ни автором бронирования (ID %s), " +
+                                    "ни владельцем вещи (ID %s)",
                             userId, bookerId, ownerId));
     }
 
