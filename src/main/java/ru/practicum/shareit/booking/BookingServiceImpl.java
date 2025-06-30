@@ -7,13 +7,15 @@ import ru.practicum.shareit.booking.dto.BookingOwnerRequestDto;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static ru.practicum.shareit.common.CheckUtility.*;
 import static ru.practicum.shareit.booking.BookingMapper.*;
@@ -74,17 +76,56 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingOwnerRequestDto> findAllBookings(long userId, State state) {
         getUser(userId);
-        if (state.equals(State.ALL)) {
-            return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
-                    .map(BookingMapper::toBookingOwnerRequestDto)
-                    .toList();
-        } else {
-            return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
-                    .map(BookingMapper::toBookingOwnerRequestDto)
-                    .filter(bookingOwnerRequestDto -> bookingOwnerRequestDto.getStatus().equals(state))
-                    .toList();
-        }
+        List<BookingOwnerRequestDto> bookingOwnerRequestDtoList = new ArrayList<>();
+        LocalDateTime requestDateTime = LocalDateTime.now();
+        switch (state) {
+            case ALL -> {
+                bookingOwnerRequestDtoList = bookingRepository.findByBooker_IdOrderByStartAsc(userId)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
 
+            case WAITING -> {
+                bookingOwnerRequestDtoList = bookingRepository.findByBooker_IdAndStatusIsOrderByStartAsc(userId,
+                                Status.WAITING)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case REJECTED -> {
+                bookingOwnerRequestDtoList = bookingRepository.findByBooker_IdAndStatusIsOrderByStartAsc(
+                                userId, Status.REJECTED)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case CURRENT -> {
+                bookingOwnerRequestDtoList = bookingRepository
+                        .findByBooker_IdAndStatusIsAndEndIsAfterOrderByStartAsc(
+                                userId, Status.APPROVED, requestDateTime)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case PAST -> {
+                bookingOwnerRequestDtoList = bookingRepository
+                        .findByBooker_IdAndStatusIsAndStartIsBeforeOrderByStartAsc(
+                                userId, Status.APPROVED, requestDateTime)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case FUTURE -> {
+                bookingOwnerRequestDtoList = bookingRepository
+                        .findByBooker_IdAndStatusIsAndStartIsAfterOrderByStartAsc(
+                                userId, Status.APPROVED, requestDateTime)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+        }
+        return bookingOwnerRequestDtoList;
     }
 
     // Получение списка бронирований для всех вещей текущего пользователя.
@@ -93,18 +134,57 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Collection<BookingOwnerRequestDto> findAllOwnerBooking(long userId, State state) {
         getUser(userId);
-        if (state.equals(State.ALL)) {
-            return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
-                    .filter(booking -> booking.getItem().getOwner() == userId)
-                    .map(BookingMapper::toBookingOwnerRequestDto)
-                    .toList();
-        } else {
-            return bookingRepository.findByBooker_IdOrderByStartAsc(userId).stream()
-                    .filter(booking -> booking.getItem().getOwner() == userId)
-                    .map(BookingMapper::toBookingOwnerRequestDto)
-                    .filter(bookingOwnerRequestDto -> bookingOwnerRequestDto.getStatus().equals(state))
-                    .toList();
+        LocalDateTime requestDateTime = LocalDateTime.now();
+        List<BookingOwnerRequestDto> bookingOwnerRequestDtoList = new ArrayList<>();
+        switch (state) {
+            case ALL -> {
+                bookingOwnerRequestDtoList = bookingRepository.findByItemOwner_IdOrderByStartAsc(userId)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+
+            case WAITING -> {
+                bookingOwnerRequestDtoList = bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(userId,
+                                Status.WAITING)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case REJECTED -> {
+                bookingOwnerRequestDtoList = bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(
+                                userId, Status.REJECTED)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case CURRENT -> {
+                bookingOwnerRequestDtoList = bookingRepository
+                        .findByItemOwner_IdAndStatusIsAndEndIsAfterOrderByStartAsc(
+                                userId, Status.APPROVED, requestDateTime)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case PAST -> {
+                bookingOwnerRequestDtoList = bookingRepository
+                        .findByItemOwner_IdAndStatusIsAndStartIsAfterOrderByStartAsc(
+                                userId, Status.APPROVED, requestDateTime)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+            case FUTURE -> {
+                bookingOwnerRequestDtoList = bookingRepository
+                        .findByItemOwner_IdAndStatusIsAndStartIsBeforeOrderByStartAsc(
+                                userId, Status.APPROVED, requestDateTime)
+                        .stream()
+                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .toList();
+            }
+
         }
+        return bookingOwnerRequestDtoList;
     }
 
     private User getUser(long userId) {

@@ -38,7 +38,7 @@ public class BookingMapper {
                 .build();
     }
 
-    public static BookingOwnerRequestDto toBookingOwnerRequestDto(Booking booking) {
+    public static BookingOwnerRequestDto toBookingOwnerRequestDto(Booking booking, LocalDateTime requestDatetime) {
 
         BookingOwnerRequestDto bookingOwnerRequestDto = BookingOwnerRequestDto.builder()
                 .id(booking.getId())
@@ -50,15 +50,15 @@ public class BookingMapper {
 
         if (booking.getStatus().equals(Status.CANCELED) || booking.getStatus().equals(Status.REJECTED))
             bookingOwnerRequestDto.setStatus(State.REJECTED);
-        if (booking.getStatus().equals(Status.APPROVED) && (booking.getStart().isAfter(LocalDateTime.now())))
+        if (booking.getStatus().equals(Status.APPROVED) && (booking.getStart().isAfter(requestDatetime)))
             bookingOwnerRequestDto.setStatus(State.FUTURE);
-        if (booking.getStatus().equals(Status.APPROVED) && (booking.getEnd().isBefore(LocalDateTime.now())))
+        if (booking.getStatus().equals(Status.APPROVED) && (booking.getEnd().isBefore(requestDatetime)))
             bookingOwnerRequestDto.setStatus(State.PAST);
         if (booking.getStatus().equals(Status.APPROVED) &&
-                ((booking.getStart().isEqual(LocalDateTime.now())
-                        || booking.getStart().isBefore(LocalDateTime.now()))
-                        || (booking.getEnd().isEqual(LocalDateTime.now())
-                        || booking.getEnd().isAfter(LocalDateTime.now()))))
+                ((booking.getStart().isEqual(requestDatetime)
+                        || booking.getStart().isBefore(requestDatetime))
+                        || (booking.getEnd().isEqual(requestDatetime)
+                        || booking.getEnd().isAfter(requestDatetime))))
             bookingOwnerRequestDto.setStatus(State.CURRENT);
 
         return bookingOwnerRequestDto;

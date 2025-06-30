@@ -48,7 +48,7 @@ public class BookingController {
     @GetMapping
     public Collection<BookingOwnerRequestDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                                       @RequestParam(name = "state", required = false,
-                                                  defaultValue = "ALL") State state) {
+                                                              defaultValue = "ALL") State state) {
         return bookingService.findAllBookings(userId, state);
     }
 
@@ -56,8 +56,8 @@ public class BookingController {
     // Эндпоинт — `GET /bookings/owner?state={state}`. Этот запрос имеет смысл для владельца хотя бы одной вещи.
     @GetMapping("/owner")
     public Collection<BookingOwnerRequestDto> findAllByOwner(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
-                                                 @RequestParam(name = "state", required = false,
-                                                         defaultValue = "ALL") State state) {
+                                                             @RequestParam(name = "state", required = false,
+                                                                     defaultValue = "ALL") State state) {
         return bookingService.findAllOwnerBooking(userId, state);
     }
 
