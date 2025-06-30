@@ -17,11 +17,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBooker_IdAndStatusIsAndEndIsAfterOrderByStartAsc(long bookerId, Status status,
                                                                          LocalDateTime requestDateTime);
 
+    List<Booking> findByBooker_IdAndStatusIsAndEndIsBeforeOrderByStartAsc(long bookerId, Status status,
+                                                                            LocalDateTime requestDateTime);
+
     List<Booking> findByBooker_IdAndStatusIsAndStartIsAfterOrderByStartAsc(long bookerId, Status status,
                                                                            LocalDateTime requestDateTime);
 
-    List<Booking> findByBooker_IdAndStatusIsAndStartIsBeforeOrderByStartAsc(long bookerId, Status status,
-                                                                            LocalDateTime requestDateTime);
 
     // запросные методы для получение данных о бронировании для всех вещей текущего пользователя,включая его статус
     // здесь нужен запрос не ByBooker_Id, а ByItem_Owner_Id
@@ -32,11 +33,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByItemOwner_IdAndStatusIsAndEndIsAfterOrderByStartAsc(long bookerId, Status status,
                                                                             LocalDateTime requestDateTime);
 
-    List<Booking> findByItemOwner_IdAndStatusIsAndStartIsAfterOrderByStartAsc(long bookerId, Status status,
-                                                                           LocalDateTime requestDateTime);
+    List<Booking> findByItemOwner_IdAndStatusIsAndEndIsBeforeOrderByStartAsc(long bookerId, Status status,
+                                                                               LocalDateTime requestDateTime);
 
-    List<Booking> findByItemOwner_IdAndStatusIsAndStartIsBeforeOrderByStartAsc(long bookerId, Status status,
-                                                                            LocalDateTime requestDateTime);
+    List<Booking> findByItemOwner_IdAndStatusIsAndStartIsAfterOrderByStartAsc(long bookerId, Status status,
+                                                                              LocalDateTime requestDateTime);
 
     // запросные методы для ItemService
     List<Booking> findByItem_IdAndEndIsBeforeOrderByEndAsc(Long itemId, LocalDateTime end);

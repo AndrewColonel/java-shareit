@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ru.practicum.shareit.common.CheckUtility.*;
 import static ru.practicum.shareit.booking.BookingMapper.*;
@@ -94,11 +96,16 @@ public class BookingServiceImpl implements BookingService {
                         .toList();
             }
             case REJECTED -> {
-                bookingOwnerRequestDtoList = bookingRepository.findByBooker_IdAndStatusIsOrderByStartAsc(
-                                userId, Status.REJECTED)
-                        .stream()
-                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
-                        .toList();
+                bookingOwnerRequestDtoList = Stream.concat(
+                        bookingRepository.findByBooker_IdAndStatusIsOrderByStartAsc(
+                                        userId, Status.REJECTED)
+                                .stream()
+                                .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime)),
+                        bookingRepository.findByBooker_IdAndStatusIsOrderByStartAsc(
+                                        userId, Status.CANCELED)
+                                .stream()
+                                .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                ).toList();
             }
             case CURRENT -> {
                 bookingOwnerRequestDtoList = bookingRepository
@@ -106,11 +113,12 @@ public class BookingServiceImpl implements BookingService {
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .filter(bookingOwnerRequestDto -> bookingOwnerRequestDto.getStatus().equals(State.CURRENT))
                         .toList();
             }
             case PAST -> {
                 bookingOwnerRequestDtoList = bookingRepository
-                        .findByBooker_IdAndStatusIsAndStartIsBeforeOrderByStartAsc(
+                        .findByBooker_IdAndStatusIsAndEndIsBeforeOrderByStartAsc(
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
@@ -152,11 +160,17 @@ public class BookingServiceImpl implements BookingService {
                         .toList();
             }
             case REJECTED -> {
-                bookingOwnerRequestDtoList = bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(
-                                userId, Status.REJECTED)
-                        .stream()
-                        .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
-                        .toList();
+                bookingOwnerRequestDtoList = Stream.concat(
+                        bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(
+                                        userId, Status.REJECTED)
+                                .stream()
+                                .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime)),
+                        bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(
+                                        userId, Status.CANCELED)
+                                .stream()
+                                .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                ).toList();
+
             }
             case CURRENT -> {
                 bookingOwnerRequestDtoList = bookingRepository
@@ -164,11 +178,12 @@ public class BookingServiceImpl implements BookingService {
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
+                        .filter(bookingOwnerRequestDto -> bookingOwnerRequestDto.getStatus().equals(State.CURRENT))
                         .toList();
             }
             case PAST -> {
                 bookingOwnerRequestDtoList = bookingRepository
-                        .findByItemOwner_IdAndStatusIsAndStartIsAfterOrderByStartAsc(
+                        .findByItemOwner_IdAndStatusIsAndEndIsBeforeOrderByStartAsc(
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
@@ -176,7 +191,7 @@ public class BookingServiceImpl implements BookingService {
             }
             case FUTURE -> {
                 bookingOwnerRequestDtoList = bookingRepository
-                        .findByItemOwner_IdAndStatusIsAndStartIsBeforeOrderByStartAsc(
+                        .findByItemOwner_IdAndStatusIsAndStartIsAfterOrderByStartAsc(
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingOwnerRequestDto(booking, requestDateTime))
