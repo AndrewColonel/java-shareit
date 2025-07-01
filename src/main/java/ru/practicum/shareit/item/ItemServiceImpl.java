@@ -33,8 +33,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(long userId, NewItemDto newItemDto) {
         // валидация  userDto и userId выполняется контроллером
         //валидация владелца как зарегистрированного пользоыателя
-        userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
+        getUser(userId);
         // валидация пользователя как владельца - isOwner(userId, itemDto.getOwner()) не проходитт по тесту)))
         newItemDto.setOwner(userId);
         return toItemDto(
@@ -48,11 +47,9 @@ public class ItemServiceImpl implements ItemService {
         // валидация объекта Вещь для обновления
         isItemPatchDto(itemPatchDto);
         // валидация владелца как зарегистрированного пользоыателя
-        userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
+        getUser(userId);
         // Валидация вещи для обновления
-        Item oldItem = itemRepository.findById(itemId).orElseThrow(() ->
-                new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
+        Item oldItem = getItem(itemId);
         // валидация пользователя как владельца
         isOwner(userId, oldItem.getOwner());
         return toItemDto(
@@ -62,19 +59,20 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemViewingDto getItemById(long userId, long itemId) {
         // валидация  itemId и userId
-        userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
-        Item item = itemRepository.findById(itemId).orElseThrow(() ->
-                new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
+        getUser(userId);
+        Item item = getItem(itemId);
         // нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования для каждой вещи
         // в соответсвии с тестами postman
         LocalDateTime lastBooking = null;
         LocalDateTime nextBooking = null;
+        LocalDateTime requestTime = LocalDateTime.now();
         if (isOwnerBoolean(userId, item.getOwner())) {
-            if (getBookingDateTime(itemId).get("last").isPresent())
-                lastBooking = getBookingDateTime(itemId).get("last").get();
-            if (getBookingDateTime(itemId).get("next").isPresent())
-                nextBooking = getBookingDateTime(itemId).get("next").get();
+            List<Booking> bookingListBefore =
+                    bookingRepository.findByItem_IdAndEndIsBeforeOrderByEndAsc(itemId, requestTime);
+            List<Booking> bookingListAfter =
+                    bookingRepository.findByItem_IdAndStartIsAfterOrderByEndAsc(itemId, requestTime);
+            if (!bookingListBefore.isEmpty()) lastBooking = bookingListBefore.getLast().getEnd();
+            if (!bookingListAfter.isEmpty()) nextBooking = bookingListAfter.getFirst().getEnd();
         }
         List<Long> commentsList = commentRepository.findByAuthor_IdAndItem_IdOrderByCreatedAsc(userId, itemId)
                 .stream()
@@ -85,8 +83,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemOwnerViewingDto> findAllItems(long userId) {
-        userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
+        getUser(userId);
         return itemRepository.findByOwner(userId).stream()
                 .map(item -> {
                     // нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования
@@ -115,10 +112,8 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public CommentDto createComment(long userId, long itemId, CommentDto commentDto) {
-        User booker = userRepository.findById(userId).orElseThrow(() ->
-                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
-        Item item = itemRepository.findById(itemId).orElseThrow(() ->
-                new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
+        User booker = getUser(userId);
+        Item item = getItem(itemId);
         //Отзыв может оставить только тот пользователь, который брал эту вещь в аренду, и только после
         //окончания срока аренды.
         LocalDateTime requestTime = LocalDateTime.now();
@@ -138,7 +133,18 @@ public class ItemServiceImpl implements ItemService {
                 ? Optional.empty() : Optional.of(booking.getLast().getEnd());
         booking = bookingRepository.findByItem_IdAndStartIsAfterOrderByEndAsc(itemId, requestTime);
         Optional<LocalDateTime> nextBooking = booking.isEmpty()
-                ? Optional.empty() : Optional.of(booking.getLast().getEnd());
+                ? Optional.empty() : Optional.of(booking.getFirst().getEnd());
         return Map.of("last", lastBooking, "next", nextBooking);
     }
+
+    private User getUser(long userId) {
+        return userRepository.findById(userId).orElseThrow(() ->
+                new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
+    }
+
+    private Item getItem(long itemId) {
+        return itemRepository.findById(itemId).orElseThrow(() ->
+                new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
+    }
+
 }
