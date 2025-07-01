@@ -85,15 +85,21 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Collection<ItemOwnerViewingDto> findAllItems(long userId) {
         getUser(userId);
+        // получаем списко вещей этого владельца
         List<Item> itemList = itemRepository.findByOwner(userId);
+        // списко вещей владельца преобразуем в списко ID вещей
         List<Long> itemIdList = itemList.stream()
                 .map(Item::getId)
                 .toList();
+        // получаю списко броней для данного списка ID вещей
         List<Booking> bookingList = bookingRepository.findByItem_IdInOrderByStartAsc(itemIdList);
+        // собираю мапу для вещей
         Map<Long, List<Booking>> ownerBookingMap = bookingList.stream()
                 .collect(groupingBy(booking -> booking.getItem().getId()));
 
+        // получаю списко комментов для данного списка ID  вещей
         List<Comment> commentList = commentRepository.findByItem_IdInOrderByCreatedAsc(itemIdList);
+        // собираю мапу для комментов
         Map<Long, List<Comment>> ownerCommentsMap = commentList.stream()
                 .collect(groupingBy(comment -> comment.getItem().getId()));
 
