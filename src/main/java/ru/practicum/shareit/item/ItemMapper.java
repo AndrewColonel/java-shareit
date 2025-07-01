@@ -50,12 +50,13 @@ public class ItemMapper {
     }
 
     public static ItemOwnerViewingDto toItemOwnerRequestDtoV2(
-            Item item,LocalDateTime lastBooking, LocalDateTime nextBooking) {
+            Item item,LocalDateTime lastBooking, LocalDateTime nextBooking, List<Long> commentsId) {
         return ItemOwnerViewingDto.builder()
                 .name(item.getName())
                 .description(item.getDescription())
                 .lastBooking(lastBooking)
                 .nextBooking(nextBooking)
+                .comments(commentsId)
                 .build();
     }
 

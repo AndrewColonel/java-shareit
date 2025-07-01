@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.*;
 import static ru.practicum.shareit.common.CheckUtility.*;
 import static ru.practicum.shareit.item.CommentMapper.*;
 import static ru.practicum.shareit.item.ItemMapper.*;
@@ -74,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
             if (!bookingListBefore.isEmpty()) lastBooking = bookingListBefore.getLast().getEnd();
             if (!bookingListAfter.isEmpty()) nextBooking = bookingListAfter.getFirst().getEnd();
         }
-        List<Long> commentsList = commentRepository.findByAuthor_IdAndItem_IdOrderByCreatedAsc(userId, itemId)
+        List<Long> commentsList = commentRepository.findByItem_IdOrderByCreatedAsc(itemId)
                 .stream()
                 .map(Comment::getId)
                 .toList();
@@ -84,17 +85,46 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public Collection<ItemOwnerViewingDto> findAllItems(long userId) {
         getUser(userId);
-        return itemRepository.findByOwner(userId).stream()
+        List<Item> itemList = itemRepository.findByOwner(userId);
+        List<Long> itemIdList = itemList.stream()
+                .map(Item::getId)
+                .toList();
+        List<Booking> bookingList = bookingRepository.findByItem_IdInOrderByStartAsc(itemIdList);
+        Map<Long, List<Booking>> ownerBookingMap = bookingList.stream()
+                .collect(groupingBy(booking -> booking.getItem().getId()));
+
+        List<Comment> commentList = commentRepository.findByItem_IdInOrderByCreatedAsc(itemIdList);
+        Map<Long, List<Comment>> ownerCommentsMap = commentList.stream()
+                .collect(groupingBy(comment -> comment.getItem().getId()));
+
+
+        return itemList.stream()
                 .map(item -> {
-                    // нужно, чтобы владелец видел даты последнего и ближайшего следующего бронирования
-                    // для каждой вещи когда просматривает список (`GET /items`).
                     LocalDateTime lastBooking = null;
                     LocalDateTime nextBooking = null;
-                    if (getBookingDateTime(item.getId()).get("last").isPresent())
-                        lastBooking = getBookingDateTime(item.getId()).get("last").get();
-                    if (getBookingDateTime(item.getId()).get("next").isPresent())
-                        nextBooking = getBookingDateTime(item.getId()).get("next").get();
-                    return ItemMapper.toItemOwnerRequestDtoV2(item, lastBooking, nextBooking);
+                    List<Long> comments = List.of();
+                    LocalDateTime requestTime = LocalDateTime.now();
+                    if (Objects.nonNull(ownerBookingMap.get(item.getId()))) {
+                        if (!ownerBookingMap.get(item.getId()).isEmpty())
+                            lastBooking = ownerBookingMap.get(item.getId()).stream()
+                                    .map(Booking::getEnd)
+                                    .filter(end -> end.isBefore(requestTime))
+                                    .toList().getLast();
+
+                        if (!ownerBookingMap.get(item.getId()).isEmpty())
+                            nextBooking = ownerBookingMap.get(item.getId()).stream()
+                                    .map(Booking::getEnd)
+                                    .filter(end -> end.isAfter(requestTime))
+                                    .toList().getFirst();
+                    }
+                    if (Objects.nonNull(ownerCommentsMap.get(item.getId()))) {
+                        if (!ownerCommentsMap.get(item.getId()).isEmpty())
+                            comments = ownerCommentsMap.get(item.getId()).stream()
+                                    .map(Comment::getId)
+                                    .toList();
+                    }
+
+                    return ItemMapper.toItemOwnerRequestDtoV2(item, lastBooking, nextBooking, comments);
                 })
                 .toList();
     }
