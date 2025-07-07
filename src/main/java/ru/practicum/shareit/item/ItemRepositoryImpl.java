@@ -11,12 +11,12 @@ import static java.util.stream.Collectors.*;
 
 @Repository
 @AllArgsConstructor
-public class ItemRepositoryImpl implements ItemRepository {
-
+public class ItemRepositoryImpl {
+    // implements ItemRepository
     // хранилище вещей
     private final Map<Long, Item> items = new HashMap<>();
 
-    @Override
+    //    @Override
     public Item save(long userId, Item item) {
         item.setId(getNextId());
         item.setOwner(userId);
@@ -24,7 +24,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         return item;
     }
 
-    @Override
+    //    @Override
     public Item update(long itemId, Item oldItem, Item newItem) {
         if (Objects.nonNull(newItem.getName())) oldItem.setName(newItem.getName());
         if (Objects.nonNull(newItem.getDescription())) oldItem.setDescription(newItem.getDescription());
@@ -32,7 +32,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         return oldItem;
     }
 
-    @Override
+    //    @Override
     public Item findById(long itemId) {
         // Информацию о конкретной вещи по её идентификатору
         // может просмотреть любой пользователь.
@@ -42,14 +42,14 @@ public class ItemRepositoryImpl implements ItemRepository {
         return item;
     }
 
-    @Override
+    //    @Override
     public List<Item> findAll(long userId) {
         return items.values().stream()
                 .filter(item -> item.getOwner() == userId)
                 .toList();
     }
 
-    @Override
+    //    @Override
     public Set<Item> search(String searchQuery) {
         if (searchQuery.isEmpty() || searchQuery.isBlank())
             return Set.of();

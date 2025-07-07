@@ -10,12 +10,12 @@ import java.util.*;
 
 @Repository
 @AllArgsConstructor
-public class UserRepositoryImpl implements UserRepository {
-
+public class UserRepositoryImpl {
+    // implements UserRepository
     // хранилище пользователей
     private final Map<Long, User> users = new HashMap<>();
 
-    @Override
+    //    @Override
     public User save(User user) {
         // проверка на совпадение почты, далее буждет выполняться ср6едсвами БД
         isEqualEmail(user.getEmail());
@@ -24,14 +24,14 @@ public class UserRepositoryImpl implements UserRepository {
         return user;
     }
 
-    @Override
+    //    @Override
     public List<User> findAll() {
         return users.keySet().stream()
                 .map(users::get)
                 .toList();
     }
 
-    @Override
+    //    @Override
     public User findById(long id) {
         User user = users.get(id);
         if (Objects.isNull(user))
@@ -39,7 +39,7 @@ public class UserRepositoryImpl implements UserRepository {
         return user;
     }
 
-    @Override
+    //    @Override
     public User update(long id, User oldUser, User newUser) {
         // проверка на совпадение почты, далее буждет выполняться ср6едсвами БД
         if (Objects.nonNull(newUser.getEmail())) isEqualEmail(newUser.getEmail());
@@ -48,7 +48,7 @@ public class UserRepositoryImpl implements UserRepository {
         return oldUser;
     }
 
-    @Override
+    //    @Override
     public User delete(long id) {
         User user = findById(id);
         users.remove(id);

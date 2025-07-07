@@ -1,5 +1,6 @@
 package ru.practicum.shareit.common;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -12,9 +13,9 @@ import ru.practicum.shareit.exception.ValidationException;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
+    @ExceptionHandler({DuplicatedDataException.class, DataIntegrityViolationException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicatedDataException(final DuplicatedDataException e) {
+    public ErrorResponse handleDuplicatedDataException(final RuntimeException e) {
         return new ErrorResponse("DuplicatedDataException", e.getMessage());
     }
 

@@ -4,9 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemPatchDto;
-import ru.practicum.shareit.item.dto.ItemRequestDto;
+import ru.practicum.shareit.item.dto.*;
 
 import java.util.Collection;
 
@@ -19,8 +17,8 @@ public class ItemController {
 
     @PostMapping
     public ItemDto create(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
-                          @Valid @RequestBody ItemDto itemDto) {
-        return itemService.createItem(userId, itemDto);
+                          @Valid @RequestBody NewItemDto newItemDto) {
+        return itemService.createItem(userId, newItemDto);
     }
 
     @PatchMapping("/{itemId}")
@@ -31,12 +29,13 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@Positive @PathVariable("itemId") long itemId) {
-        return itemService.getItemById(itemId);
+    public ItemViewingDto getById(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
+                                  @Positive @PathVariable("itemId") long itemId) {
+        return itemService.getItemById(userId, itemId);
     }
 
     @GetMapping
-    public Collection<ItemRequestDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId) {
+    public Collection<ItemOwnerViewingDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId) {
         return itemService.findAllItems(userId);
     }
 
@@ -44,6 +43,14 @@ public class ItemController {
     @GetMapping("/search")
     public Collection<ItemDto> search(@RequestParam(value = "text", required = false) String searchQuery) {
         return itemService.searchItems(searchQuery);
+    }
+
+    // POST /items/{itemId}/comment
+    @PostMapping("/{itemId}/comment")
+    public CommentDto create(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
+                             @Positive @PathVariable("itemId") long itemId,
+                             @Valid @RequestBody CommentDto commentDto) {
+        return itemService.createComment(userId,itemId, commentDto);
     }
 
 }

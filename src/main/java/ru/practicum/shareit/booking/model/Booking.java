@@ -1,27 +1,44 @@
-package ru.practicum.shareit.booking;
+package ru.practicum.shareit.booking.model;
 
-import lombok.Builder;
-import lombok.Data;
+import jakarta.persistence.*;
+import lombok.*;
+import ru.practicum.shareit.booking.Status;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Entity
+@Table(name = "bookings")
+@Getter
+@Setter
+@ToString
 public class Booking {
     // уникальный идентификатор бронирования
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     // дата и время начала бронирования
+    @Column(name = "start_date")
     private LocalDateTime start;
     //дата и время конца бронирования
+    @Column(name = "end_date")
     private LocalDateTime end;
-    // вещь, которую пользователь бронирует
-    private long item;
     //пользователь, который осуществляет бронирование
-    private long booker;
+    @ManyToOne
+    @JoinColumn(name = "booker_id")
+    private User booker;
+    // вещь, которую пользователь бронирует
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
     // статус бронирования. Может принимать одно из следующихзначений:
     // WAITING — новое бронирование, ожидает одобрения,
     // APPROVED — бронирование подтверждено владельцем,
     // REJECTED — бронирование отклонено владельцем,
     // CANCELED — бронирование отменено создателем.
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", length = 15)
     private Status status;
+
 }

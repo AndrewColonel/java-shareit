@@ -1,24 +1,21 @@
-package ru.practicum.shareit.user.model;
+package ru.practicum.shareit.user.dto;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
+import lombok.Data;
 
-@Entity
-@Table(name = "users")
-@Getter
-@Setter
-@ToString
-public class User {
+@Data
+@Builder
+public class NewUserDto {
     // уникальный идентификатор пользователя
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     // имя или логин пользователя
-    @Column(name = "name", length = 255, nullable = false)
+    @NotBlank
     private String name;
     // адрес электронной почты (учтите, что два пользователя не могут
     // иметь одинаковый адрес электронной почты)
-    @Column(name = "email", length = 255, nullable = false)
+    @Email
+    @NotBlank
     private String email;
 }
-
