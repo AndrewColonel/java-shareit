@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class BookingOwnerRequestDto {
+public class BookingStateRequestDto {
     // уникальный идентификатор бронирования
     private long id;
     // дата и время начала бронирования

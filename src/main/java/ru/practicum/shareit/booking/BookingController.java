@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingOwnerRequestDto;
+import ru.practicum.shareit.booking.dto.BookingStateRequestDto;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 
 import java.util.Collection;
@@ -46,18 +46,18 @@ public class BookingController {
     // Эндпоинт — `GET /bookings?state={state}`
     // Параметр `state` необязательный и по умолчанию равен `ALL` (англ. «все»).
     @GetMapping
-    public Collection<BookingOwnerRequestDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
+    public Collection<BookingStateRequestDto> findAll(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                                       @RequestParam(name = "state", required = false,
-                                                              defaultValue = "ALL") State state) {
+                                                              defaultValue = "ALL") String state) {
         return bookingService.findAllBookings(userId, state);
     }
 
     // Получение списка бронирований для всех вещей текущего пользователя.
     // Эндпоинт — `GET /bookings/owner?state={state}`. Этот запрос имеет смысл для владельца хотя бы одной вещи.
     @GetMapping("/owner")
-    public Collection<BookingOwnerRequestDto> findAllByOwner(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
+    public Collection<BookingStateRequestDto> findAllByOwner(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                                              @RequestParam(name = "state", required = false,
-                                                                     defaultValue = "ALL") State state) {
+                                                                     defaultValue = "ALL") String state) {
         return bookingService.findAllOwnerBooking(userId, state);
     }
 

@@ -3,7 +3,7 @@ package ru.practicum.shareit.booking;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.dto.BookingOwnerRequestDto;
+import ru.practicum.shareit.booking.dto.BookingStateRequestDto;
 import ru.practicum.shareit.booking.dto.NewBookingDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.item.model.Item;
@@ -38,9 +38,9 @@ public class BookingMapper {
                 .build();
     }
 
-    public static BookingOwnerRequestDto toBookingOwnerRequestDto(Booking booking, LocalDateTime requestDatetime) {
+    public static BookingStateRequestDto toBookingStateRequestDto(Booking booking, LocalDateTime requestDatetime) {
 
-        BookingOwnerRequestDto bookingOwnerRequestDto = BookingOwnerRequestDto.builder()
+        BookingStateRequestDto bookingStateRequestDto = BookingStateRequestDto.builder()
                 .id(booking.getId())
                 .start(booking.getStart())
                 .end(booking.getEnd())
@@ -49,19 +49,24 @@ public class BookingMapper {
                 .build();
 
         if (booking.getStatus().equals(Status.CANCELED) || booking.getStatus().equals(Status.REJECTED))
-            bookingOwnerRequestDto.setStatus(State.REJECTED);
-        if (booking.getStatus().equals(Status.APPROVED) && (booking.getStart().isAfter(requestDatetime)))
-            bookingOwnerRequestDto.setStatus(State.FUTURE);
-        if (booking.getStatus().equals(Status.APPROVED) && (booking.getEnd().isBefore(requestDatetime)))
-            bookingOwnerRequestDto.setStatus(State.PAST);
+            bookingStateRequestDto.setStatus(State.REJECTED);
+        if (booking.getStatus().equals(Status.APPROVED) && (booking.getStart().isAfter(requestDatetime))) {
+            bookingStateRequestDto.setStatus(State.FUTURE);
+            return bookingStateRequestDto;
+        }
+        if (booking.getStatus().equals(Status.APPROVED) && (booking.getEnd().isBefore(requestDatetime))) {
+            bookingStateRequestDto.setStatus(State.PAST);
+            return bookingStateRequestDto;
+        }
+
         if (booking.getStatus().equals(Status.APPROVED) &&
                 ((booking.getStart().isEqual(requestDatetime)
                         || booking.getStart().isBefore(requestDatetime))
                         || (booking.getEnd().isEqual(requestDatetime)
                         || booking.getEnd().isAfter(requestDatetime))))
-            bookingOwnerRequestDto.setStatus(State.CURRENT);
+            bookingStateRequestDto.setStatus(State.CURRENT);
 
-        return bookingOwnerRequestDto;
+        return bookingStateRequestDto;
     }
 
 }
