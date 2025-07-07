@@ -108,26 +108,33 @@ public class ItemServiceImpl implements ItemService {
                 .map(item -> {
                     LocalDateTime lastBooking = null;
                     LocalDateTime nextBooking = null;
-                    List<Long> comments = List.of();
+                    List<Long> comments = new ArrayList<>();
                     LocalDateTime requestTime = LocalDateTime.now();
                     if (Objects.nonNull(ownerBookingMap.get(item.getId()))) {
-                        if (!ownerBookingMap.get(item.getId()).isEmpty())
-                            lastBooking = ownerBookingMap.get(item.getId()).stream()
+                        if (!ownerBookingMap.get(item.getId()).isEmpty()) {
+                            List<LocalDateTime> lastBookingDateList = ownerBookingMap.get(item.getId()).stream()
                                     .map(Booking::getEnd)
                                     .filter(end -> end.isBefore(requestTime))
-                                    .toList().getLast();
+                                    .toList();
+                            if (!lastBookingDateList.isEmpty())
+                                lastBooking = lastBookingDateList.getLast();
+                        }
 
-                        if (!ownerBookingMap.get(item.getId()).isEmpty())
-                            nextBooking = ownerBookingMap.get(item.getId()).stream()
+                        if (!ownerBookingMap.get(item.getId()).isEmpty()) {
+                            List<LocalDateTime> nextBookingDateList = ownerBookingMap.get(item.getId()).stream()
                                     .map(Booking::getEnd)
                                     .filter(end -> end.isAfter(requestTime))
-                                    .toList().getFirst();
+                                    .toList();
+                            if (!nextBookingDateList.isEmpty())
+                                nextBooking = nextBookingDateList.getFirst();
+                        }
+
                     }
                     if (Objects.nonNull(ownerCommentsMap.get(item.getId()))) {
                         if (!ownerCommentsMap.get(item.getId()).isEmpty())
-                            comments = ownerCommentsMap.get(item.getId()).stream()
+                            comments.addAll(ownerCommentsMap.get(item.getId()).stream()
                                     .map(Comment::getId)
-                                    .toList();
+                                    .toList());
                     }
 
                     return ItemMapper.toItemOwnerRequestDtoV2(item, lastBooking, nextBooking, comments);
