@@ -19,6 +19,6 @@ public class ItemDto {
     private long owner;
     // если вещь была создана по запросу другого пользователя, то в этом
     //поле будет храниться ссылка на соответствующий запрос
-    private ItemRequest request;
+    private Long requestId;
 
 }

@@ -2,9 +2,9 @@ package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.request.model.ItemRequest;
 
 @Data
 @Builder
@@ -24,5 +24,6 @@ public class NewItemDto {
     private long owner;
     // если вещь была создана по запросу другого пользователя, то в этом
     //поле будет храниться ссылка на соответствующий запрос
-    private ItemRequest request;
+    @Positive
+    private Long requestId;
 }
