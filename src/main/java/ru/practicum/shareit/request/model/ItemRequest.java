@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.shareit.request.dto.ItemAnswerDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,6 +29,6 @@ public class ItemRequest {
     @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
     @Transient
-    private List<ItemAnswer> items = new ArrayList<>();
+    private List<ItemAnswerDto> items = new ArrayList<>();
 
 }

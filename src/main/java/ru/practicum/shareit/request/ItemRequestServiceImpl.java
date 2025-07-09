@@ -9,7 +9,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestAnswerDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.NewItemRequestDto;
-import ru.practicum.shareit.request.model.ItemAnswer;
+import ru.practicum.shareit.request.dto.ItemAnswerDto;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 
@@ -46,7 +46,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         // получаем соотвесвующий ответ по запрошенным вещам
         List<Item> itemAnswerInterfaceList = itemRepository.findByRequest_idIn(ItemRequestIdList);
         // получаю мапу из ID запросов и списков ответов
-        Map<Long, List<ItemAnswer>> itemAnswerMap = itemAnswerInterfaceList.stream()
+        Map<Long, List<ItemAnswerDto>> itemAnswerMap = itemAnswerInterfaceList.stream()
                 .collect(groupingBy(item -> item.getRequest().getId(),
                         mapping(ItemMapper::toItemAnswer, toList())));
         return itemRequestList.stream()
@@ -74,11 +74,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(
                 () -> new NotFoundException(String.format("Запрос с ID %s не найден", requestId)));
         // получаю списко ответов на данный запрос
-        List<ItemAnswer> itemAnswerList = itemRepository.findByRequest_id(requestId).stream()
+        List<ItemAnswerDto> itemAnswerDtoList = itemRepository.findByRequest_id(requestId).stream()
                 .map(ItemMapper::toItemAnswer)
                 .toList();
         // если есть ответы, добавляю их список в поле запроса
-        if (!itemAnswerList.isEmpty()) itemRequest.setItems(itemAnswerList);
+        if (!itemAnswerDtoList.isEmpty()) itemRequest.setItems(itemAnswerDtoList);
         return toItemRequestAnswerDto(itemRequest);
     }
 

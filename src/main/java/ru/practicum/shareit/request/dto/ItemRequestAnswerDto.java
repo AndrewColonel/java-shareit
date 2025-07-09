@@ -2,7 +2,6 @@ package ru.practicum.shareit.request.dto;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.practicum.shareit.request.model.ItemAnswer;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,5 +12,5 @@ public class ItemRequestAnswerDto {
     private long id;
     private String description;
     private LocalDateTime created;
-    private List<ItemAnswer> items;
+    private List<ItemAnswerDto> items;
 }

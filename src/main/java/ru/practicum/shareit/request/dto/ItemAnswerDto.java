@@ -1,11 +1,11 @@
-package ru.practicum.shareit.request.model;
+package ru.practicum.shareit.request.dto;
 
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class ItemAnswer {
+public class ItemAnswerDto {
     private long id;
     private String name;
     private long owner;
