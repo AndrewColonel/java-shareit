@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,6 +28,6 @@ public class ItemRequest {
     @Column(name = "created", nullable = false)
     private LocalDateTime created = LocalDateTime.now();
     @Transient
-    private List<ItemAnswer> items;
+    private List<ItemAnswer> items = new ArrayList<>();
 
 }

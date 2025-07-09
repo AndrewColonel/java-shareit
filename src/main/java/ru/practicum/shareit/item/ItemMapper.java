@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.model.ItemAnswer;
 import ru.practicum.shareit.request.model.ItemRequest;
 
 import java.time.LocalDateTime;
@@ -72,6 +73,14 @@ public class ItemMapper {
                 .lastBooking(lastBooking)
                 .nextBooking(nextBooking)
                 .comments(commentsList)
+                .build();
+    }
+
+    public static ItemAnswer toItemAnswer(Item item) {
+        return ItemAnswer.builder()
+                .id(item.getId())
+                .name(item.getName())
+                .owner(item.getOwner())
                 .build();
     }
 

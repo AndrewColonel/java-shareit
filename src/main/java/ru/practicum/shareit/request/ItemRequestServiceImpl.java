@@ -3,13 +3,21 @@ package ru.practicum.shareit.request;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.ItemRepository;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestAnswerDto;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.NewItemRequestDto;
+import ru.practicum.shareit.request.model.ItemAnswer;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
+import static java.util.stream.Collectors.*;
 import static ru.practicum.shareit.request.ItemRequestMapper.*;
 
 @Service
@@ -18,6 +26,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository itemRequestRepository;
     private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
 
     @Override
     public ItemRequestDto createItemRequest(long userId, NewItemRequestDto newItemRequestDto) {
@@ -28,8 +37,26 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public List<ItemRequestAnswerDto> findAllByOwnerRequests(long userId) {
         getUser(userId);
-        return itemRequestRepository.findByRequestorOrderByCreatedAsc(userId).stream()
+        // находим список запросов пользователя
+        List<ItemRequest> itemRequestList = itemRequestRepository.findByRequestorOrderByCreatedAsc(userId);
+        // получаем список ID запросов этго пользователя для запроса соответсвующих ответов - списка вещей
+        List<Long> ItemRequestIdList = itemRequestList.stream()
+                .map(ItemRequest::getId)
+                .toList();
+        // получаем соотвесвующий ответ по запрошенным вещам
+        List<Item> itemAnswerInterfaceList = itemRepository.findByRequest_idIn(ItemRequestIdList);
+        // получаю мапу из ID запросов и списков ответов
+        Map<Long, List<ItemAnswer>> itemAnswerMap = itemAnswerInterfaceList.stream()
+                .collect(groupingBy(item -> item.getRequest().getId(),
+                        mapping(ItemMapper::toItemAnswer, toList())));
+        return itemRequestList.stream()
                 .map(ItemRequestMapper::toItemRequestAnswerDto)
+                .peek(itemRequestAnswerDto -> {
+                    if (Objects.nonNull(itemAnswerMap.get(itemRequestAnswerDto.getId()))) {
+                        if (!itemAnswerMap.get(itemRequestAnswerDto.getId()).isEmpty())
+                            itemRequestAnswerDto.setItems(itemAnswerMap.get(itemRequestAnswerDto.getId()));
+                    }
+                })
                 .toList();
     }
 
@@ -44,8 +71,15 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     @Override
     public ItemRequestAnswerDto getRequestById(long userId, long requestId) {
         getUser(userId);
-        return toItemRequestAnswerDto(itemRequestRepository.findById(requestId).orElseThrow(
-                () -> new NotFoundException(String.format("Запрос с ID %s не найден", requestId))));
+        ItemRequest itemRequest = itemRequestRepository.findById(requestId).orElseThrow(
+                () -> new NotFoundException(String.format("Запрос с ID %s не найден", requestId)));
+        // получаю списко ответов на данный запрос
+        List<ItemAnswer> itemAnswerList = itemRepository.findByRequest_id(requestId).stream()
+                .map(ItemMapper::toItemAnswer)
+                .toList();
+        // если есть ответы, добавляю их список в поле запроса
+        if (!itemAnswerList.isEmpty()) itemRequest.setItems(itemAnswerList);
+        return toItemRequestAnswerDto(itemRequest);
     }
 
     // вспомогательные методы
