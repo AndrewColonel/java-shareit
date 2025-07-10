@@ -9,6 +9,8 @@ import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequestRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.model.User;
 
@@ -29,6 +31,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
     public ItemDto createItem(long userId, NewItemDto newItemDto) {
@@ -37,8 +40,15 @@ public class ItemServiceImpl implements ItemService {
         getUser(userId);
         // валидация пользователя как владельца - isOwner(userId, itemDto.getOwner()) не проходитт по тесту)))
         newItemDto.setOwner(userId);
+
+        ItemRequest itemRequest = null;
+        if (Objects.nonNull(newItemDto.getRequestId())) {
+            itemRequest = getRequest(newItemDto.getRequestId());
+            newItemDto.setRequestId(itemRequest.getId());
+        }
+
         return toItemDto(
-                itemRepository.save(toItem(newItemDto)));
+                itemRepository.save(toItem(newItemDto, itemRequest)));
     }
 
     @Override
@@ -188,6 +198,11 @@ public class ItemServiceImpl implements ItemService {
     private Item getItem(long itemId) {
         return itemRepository.findById(itemId).orElseThrow(() ->
                 new NotFoundException(String.format("Вещь с ID %s не найдена", itemId)));
+    }
+
+    private ItemRequest getRequest(long requestId) {
+        return itemRequestRepository.findById(requestId).orElseThrow(() ->
+                new NotFoundException(String.format("Запрос с ID %s не найден", requestId)));
     }
 
 }

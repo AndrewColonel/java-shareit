@@ -3,8 +3,11 @@ package ru.practicum.shareit.request.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ru.practicum.shareit.request.dto.ItemAnswerDto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "requests")
@@ -17,12 +20,15 @@ public class ItemRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     // текст запроса, содержащий описание требуемой вещи
-    @Column(name = "description")
+    @Column(name = "description", length = 512, nullable = false)
     private String description;
     // пользователь, создавший запрос
-    @Column(name = "requestor_id")
+    @Column(name = "requestor_id", nullable = false)
     private long requestor;
     // дата и время создания запроса
+    @Column(name = "created", nullable = false)
+    private LocalDateTime created = LocalDateTime.now();
     @Transient
-    private LocalDateTime created;
+    private List<ItemAnswerDto> items = new ArrayList<>();
+
 }
