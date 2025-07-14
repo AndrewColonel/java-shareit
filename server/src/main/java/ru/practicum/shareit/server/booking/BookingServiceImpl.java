@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static ru.practicum.shareit.server.common.CheckUtility.*;
+import static ru.practicum.shareit.server.common.ServerCheckUtility.*;
 import static ru.practicum.shareit.server.booking.BookingMapper.*;
 
 

@@ -1,15 +1,15 @@
-package ru.practicum.shareit.server.common;
+package ru.practicum.shareit.gateway.common;
 
-import ru.practicum.shareit.server.booking.dto.NewBookingDto;
-import ru.practicum.shareit.server.exception.ValidationException;
-import ru.practicum.shareit.server.item.dto.ItemPatchDto;
-import ru.practicum.shareit.server.item.model.Item;
-import ru.practicum.shareit.server.user.dto.UserDto;
-import ru.practicum.shareit.server.user.dto.UserPatchDto;
+
+
+import jakarta.validation.ValidationException;
+import ru.practicum.shareit.gateway.booking.dto.NewBookingDto;
+import ru.practicum.shareit.gateway.item.dto.ItemPatchDto;
+import ru.practicum.shareit.gateway.user.dto.UserPatchDto;
 
 import java.util.Objects;
 
-public class CheckUtility {
+public class GatewayCheckUtility {
 
     //ITEMS
     // метод валидации поля id пользователя
@@ -50,21 +50,8 @@ public class CheckUtility {
             throw new ValidationException(String.format("Запрос %s не прошел валидацию", searchQuery));
     }
 
-    // метод валидации доступности вещи
-    public static void isItemAvailable(Item item) {
-        if (item.getAvailable().equals(false))
-            throw new ValidationException(String.format("Вещь %s для заказа недоступна", item.getId()));
-    }
 
     //USERS
-    // метод валидации при создании пользователя - поля должны быть все не null
-    // метод более не воссстребован - проверка аннотациями, введена модель UserPatchDto
-    public static void isUserDto(UserDto userDto) {
-        if (Objects.isNull(userDto.getName()) || Objects.isNull(userDto.getEmail()))
-            throw new ValidationException(String.format("Пользователь %s не прошел валидацию при создании",
-                    userDto));
-    }
-
     // метод валидации поля имени и  email пользователя
     public static void isUserPatchDto(UserPatchDto userPatchDto) {
         if (Objects.nonNull(userPatchDto.getName())

@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
-import static ru.practicum.shareit.server.common.CheckUtility.*;
+import static ru.practicum.shareit.server.common.ServerCheckUtility.*;
 import static ru.practicum.shareit.server.item.CommentMapper.*;
 import static ru.practicum.shareit.server.item.ItemMapper.*;
 
@@ -154,7 +154,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemDto> searchItems(String searchQuery) {
-        isStringQuery(searchQuery);
+        // isStringQuery(searchQuery); - проверка выполняется в gateway
         if (searchQuery.isEmpty() || searchQuery.isBlank())
             return Set.of();
         return itemRepository.search(searchQuery).stream()

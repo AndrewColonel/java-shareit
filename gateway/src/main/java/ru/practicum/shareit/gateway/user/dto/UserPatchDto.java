@@ -1,5 +1,5 @@
-package ru.practicum.shareit.server.user.dto;
-
+package ru.practicum.shareit.gateway.user.dto;
+import jakarta.validation.constraints.Email;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,5 +10,6 @@ public class UserPatchDto {
     private String name;
     // адрес электронной почты (учтите, что два пользователя не могут
     // иметь одинаковый адрес электронной почты)
+    @Email
     private String email;
 }
