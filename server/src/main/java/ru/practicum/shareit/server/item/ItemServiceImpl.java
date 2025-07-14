@@ -56,7 +56,7 @@ public class ItemServiceImpl implements ItemService {
         // валидация  itemId и userId выполняется контроллером
         // Редактировать вещь может только её владелец.
         // валидация объекта Вещь для обновления
-        isItemPatchDto(itemPatchDto);
+        // isItemPatchDto(itemPatchDto); - проверка выполняется в gateway
         // валидация владелца как зарегистрированного пользоыателя
         getUser(userId);
         // Валидация вещи для обновления

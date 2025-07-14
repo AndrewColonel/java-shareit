@@ -1,5 +1,6 @@
-package ru.practicum.shareit.server.request.dto;
+package ru.practicum.shareit.gateway.request.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class NewItemRequestDto {
     private long id;
+    @NotBlank
     private String description;
     private LocalDateTime created;
 }

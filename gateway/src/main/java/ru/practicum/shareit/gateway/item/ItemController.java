@@ -26,6 +26,7 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<Object> create(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                          @Valid @RequestBody NewItemDto newItemDto) {
+        log.info("Запрос пользователя {} на создание вещи {}",userId, newItemDto);
         return itemClient.createItem(userId, newItemDto);
     }
 
@@ -34,24 +35,28 @@ public class ItemController {
     public ResponseEntity<Object> update(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                          @Positive @PathVariable("itemId") long itemId,
                                          @Valid @RequestBody ItemPatchDto itemPatchDto) {
+        log.info("Запрос {} пользователя {} на обновление вещи {}", itemPatchDto, userId,itemId);
         return itemClient.updateItem(userId, itemId, itemPatchDto);
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<Object> getById(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                           @Positive @PathVariable("itemId") long itemId) {
+        log.info("Запрос на получение вещи {} от пользователя {}", userId, itemId);
         return itemClient.getItemById(userId, itemId);
     }
 
     @GetMapping
     public ResponseEntity<Object> findAll(
             @Positive @RequestHeader("X-Sharer-User-Id") long userId) {
+        log.info("Запрос на получение всех вещей пользовател {}", userId);
         return itemClient.findAllItems(userId);
     }
 
     // /items/search?text={text}
     @GetMapping("/search")
     public ResponseEntity<Object> search(@RequestParam(value = "text", required = false) String searchQuery) {
+        log.info("Запрос на поиск - {}",searchQuery);
         return itemClient.searchItems(searchQuery);
     }
 
@@ -60,6 +65,7 @@ public class ItemController {
     public ResponseEntity<Object> create(@Positive @RequestHeader("X-Sharer-User-Id") long userId,
                                          @Positive @PathVariable("itemId") long itemId,
                                          @Valid @RequestBody CommentDto commentDto) {
+        log.info("Запрос {} пользователя {} на создание комментария о вещи {}",commentDto,  userId, itemId);
         return itemClient.sreateComments(userId, itemId, commentDto);
     }
 

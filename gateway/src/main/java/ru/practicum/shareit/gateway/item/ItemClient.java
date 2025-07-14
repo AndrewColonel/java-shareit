@@ -1,7 +1,5 @@
 package ru.practicum.shareit.gateway.item;
 
-
-import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -14,10 +12,8 @@ import ru.practicum.shareit.gateway.item.dto.CommentDto;
 import ru.practicum.shareit.gateway.item.dto.ItemPatchDto;
 import ru.practicum.shareit.gateway.item.dto.NewItemDto;
 
-import java.util.Objects;
-import java.util.Set;
+import static ru.practicum.shareit.gateway.common.GatewayCheckUtility.*;
 
-import static ru.practicum.shareit.gateway.common.GatewayCheckUtility.isStringQuery;
 
 @Service
 public class ItemClient extends BaseClient {
@@ -39,11 +35,12 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateItem(long userId, long itemId, ItemPatchDto itemPatchDto) {
+        isItemPatchDto(itemPatchDto);
         return patch("/" + itemId, userId, itemPatchDto);
     }
 
     public ResponseEntity<Object> getItemById(long userId, long itemId) {
-        return get("/" + userId, itemId);
+        return get("/" + itemId, userId);
     }
 
     public ResponseEntity<Object> findAllItems(long userId) {

@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(long id, UserPatchDto userPatchDto) {
-        isUserPatchDto(userPatchDto);
+        // isUserPatchDto(userPatchDto); - выполняется в gateway
         User user = userRepository.findById(id).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", id)));
         return UserMapper.toUserDto(

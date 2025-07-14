@@ -34,7 +34,7 @@ public class BookingServiceImpl implements BookingService {
     // Добавление нового запроса на бронирование. Запрос может быть создан любым пользователем,
     @Override
     public BookingDto createBooking(long userId, NewBookingDto newBookingDto) {
-        isStartEndValid(newBookingDto); // валидация старта и конца брони
+        // isStartEndValid(newBookingDto); - валидация старта и конца брони выполняется в gateway
         // проверяем существоание такого пользователя
         User booker = getUser(userId);
         // проверяем существование вещи

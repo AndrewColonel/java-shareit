@@ -11,6 +11,8 @@ import ru.practicum.shareit.gateway.client.BaseClient;
 import ru.practicum.shareit.gateway.user.dto.NewUserDto;
 import ru.practicum.shareit.gateway.user.dto.UserPatchDto;
 
+import static ru.practicum.shareit.gateway.common.GatewayCheckUtility.isUserPatchDto;
+
 @Service
 public class UserClient extends BaseClient {
 
@@ -39,6 +41,7 @@ public class UserClient extends BaseClient {
     }
 
     public ResponseEntity<Object> updateUser(long userId, UserPatchDto userPatchDto) {
+        isUserPatchDto(userPatchDto);
         return patch("/"+ userId, userPatchDto);
     }
 

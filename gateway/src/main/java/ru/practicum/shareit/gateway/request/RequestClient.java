@@ -3,10 +3,12 @@ package ru.practicum.shareit.gateway.request;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.gateway.client.BaseClient;
+import ru.practicum.shareit.gateway.request.dto.NewItemRequestDto;
 
 @Service
 public class RequestClient extends BaseClient {
@@ -22,4 +24,21 @@ public class RequestClient extends BaseClient {
                         .build()
         );
     }
+
+    public ResponseEntity<Object> createRequest(long userId, NewItemRequestDto newItemRequestDto) {
+        return post("", userId, newItemRequestDto);
+    }
+
+    public ResponseEntity<Object> fiindAllRequestsByOwner(long userId) {
+        return get("", userId);
+    }
+
+    public ResponseEntity<Object> findAllRequests(long userId) {
+        return get("/all", userId);
+    }
+
+    public ResponseEntity<Object> getRequestById(long userId, long requestId) {
+        return get("/" + requestId, userId);
+    }
+
 }

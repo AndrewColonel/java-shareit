@@ -10,9 +10,12 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
-import ru.practicum.shareit.gateway.booking.dto.BookItemRequestDto;
+import ru.practicum.shareit.gateway.booking.dto.ApproveState;
 import ru.practicum.shareit.gateway.booking.dto.BookingState;
+import ru.practicum.shareit.gateway.booking.dto.NewBookingDto;
 import ru.practicum.shareit.gateway.client.BaseClient;
+
+import static ru.practicum.shareit.gateway.common.GatewayCheckUtility.*;
 
 @Service
 public class BookingClient extends BaseClient {
@@ -28,8 +31,23 @@ public class BookingClient extends BaseClient {
         );
     }
 
+    // PostMapping - public BookingDto create
+    public ResponseEntity<Object> createBooking(long userId, NewBookingDto newBookingDto) {
+        isStartEndValid(newBookingDto);
+        return post("", userId, newBookingDto);
+    }
+
+    public ResponseEntity<Object> updateBooking(long userId, long bookingId, ApproveState approved) {
+        return patch("/" + bookingId + "?approved=" + approved, userId);
+    }
+
+    // GetMapping("/{bookingId}") - public BookingDto getById
+    public ResponseEntity<Object> getBookingById(long userId, Long bookingId) {
+        return get("/" + bookingId, userId);
+    }
+
     // GetMapping - public Collection<BookingStateRequestDto> findAll
-    public ResponseEntity<Object> getBookings(long userId, BookingState state, Integer from, Integer size) {
+    public ResponseEntity<Object> findAllBookings(long userId, BookingState state, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
                 "state", state.name(),
                 "from", from,
@@ -38,13 +56,14 @@ public class BookingClient extends BaseClient {
         return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    // PostMapping - public BookingDto create
-    public ResponseEntity<Object> bookItem(long userId, BookItemRequestDto requestDto) {
-        return post("", userId, requestDto);
+    public ResponseEntity<Object> findAllBookingByOwner(long userId, BookingState state, Integer from, Integer size) {
+        Map<String, Object> parameters = Map.of(
+                "state", state.name(),
+                "from", from,
+                "size", size
+        );
+        return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    // GetMapping("/{bookingId}") - public BookingDto getById
-    public ResponseEntity<Object> getBooking(long userId, Long bookingId) {
-        return get("/" + bookingId, userId);
-    }
+
 }
