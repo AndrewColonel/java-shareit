@@ -1,10 +1,10 @@
 package ru.practicum.shareit.gateway.user.dto;
 import jakarta.validation.constraints.Email;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserPatchDto {
     // имя или логин пользователя
     private String name;

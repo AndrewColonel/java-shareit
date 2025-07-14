@@ -1,10 +1,10 @@
 package ru.practicum.shareit.gateway.item.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemPatchDto {
     // модель для обновления
     // Изменить можно название, описание и статус доступа к аренде.

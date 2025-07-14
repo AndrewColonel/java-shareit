@@ -2,11 +2,11 @@ package ru.practicum.shareit.gateway.user.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class NewUserDto {
     // уникальный идентификатор пользователя
     private long id;

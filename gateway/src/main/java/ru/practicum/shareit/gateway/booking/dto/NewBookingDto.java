@@ -1,15 +1,16 @@
 package ru.practicum.shareit.gateway.booking.dto;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Data
-@Builder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class NewBookingDto {
     // дата и время начала бронирования
     @NotNull
@@ -17,7 +18,7 @@ public class NewBookingDto {
     private LocalDateTime start;
     //дата и время конца бронирования
     @NotNull
-    @FutureOrPresent
+    @Future
     private LocalDateTime end;
     // вещь, которую пользователь бронирует
     @Positive

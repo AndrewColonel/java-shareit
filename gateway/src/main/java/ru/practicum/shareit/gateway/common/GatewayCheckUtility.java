@@ -1,7 +1,5 @@
 package ru.practicum.shareit.gateway.common;
 
-
-
 import jakarta.validation.ValidationException;
 import ru.practicum.shareit.gateway.booking.dto.NewBookingDto;
 import ru.practicum.shareit.gateway.item.dto.ItemPatchDto;
@@ -12,12 +10,6 @@ import java.util.Objects;
 public class GatewayCheckUtility {
 
     //ITEMS
-    // метод валидации поля id пользователя
-    public static void isItemGetId(long id) {
-        if (id < 1) throw new ValidationException(
-                String.format("ID %s  не прошел валидацию", id));
-    }
-
     // метод  валидации полей itemPatchDto
     public static void isItemPatchDto(ItemPatchDto itemPatchDto) {
         if (Objects.nonNull(itemPatchDto.getName())
@@ -31,18 +23,6 @@ public class GatewayCheckUtility {
                     String.format("Вещь %s не прошла валидацию описания при обновлении", itemPatchDto));
     }
 
-    // метод валидации пользователя как владельца конкретной вещи
-    public static void isOwner(long userId, long ownerId) {
-        if (userId != ownerId)
-            throw new ValidationException(
-                    String.format("Пользователь с ID %s не является владельцем вещи c ID влдаельца %s",
-                            userId, ownerId));
-    }
-
-    // метод валидации пользователя как владельца конкретной вещи
-    public static boolean isOwnerBoolean(long userId, long ownerId) {
-       return userId == ownerId;
-    }
 
     // метод валидации строки запроса
     public static void isStringQuery(String searchQuery) {
@@ -64,14 +44,6 @@ public class GatewayCheckUtility {
                     userPatchDto));
     }
 
-    // метод валидации поля id пользователя
-    // метод невостребован - id передается через PAthVariable - нет значения, не работает ендпоинт
-    // проверка на положительное значение через анногтацию @Positive
-    public static void isUserGetId(long id) {
-        if (id < 1) throw new ValidationException(
-                String.format("ID %s пользователя не прошел валидацию", id));
-    }
-
     //BOOKINGS
     // метод валидации BookingDto
     public static void isStartEndValid(NewBookingDto newBookingDto) {
@@ -81,23 +53,6 @@ public class GatewayCheckUtility {
                             "Дата начала аренды %s наступает после или одновременно с датой конца %s аренды",
                     newBookingDto.getStart(), newBookingDto.getEnd()));
 
-    }
-
-    // метод валидации автора бронирования
-    public static void isBooker(long userId, long bookerId) {
-        if (userId != bookerId)
-            throw new ValidationException(
-                    String.format("Пользователь с ID %s не является автором бронирования с ID %s",
-                            userId, bookerId));
-    }
-
-    // метод валидации автора и влдальца
-    public static void isBookerOrOwner(long userId, long bookerId, long ownerId) {
-        if ((userId != bookerId) && (userId != ownerId))
-            throw new ValidationException(
-                    String.format("Пользователь с ID %s не является ни автором бронирования (ID %s), " +
-                                    "ни владельцем вещи (ID %s)",
-                            userId, bookerId, ownerId));
     }
 
 }
