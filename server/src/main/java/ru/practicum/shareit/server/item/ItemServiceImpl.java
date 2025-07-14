@@ -172,24 +172,12 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime requestTime = LocalDateTime.now();
         bookingRepository.findByBooker_IdAndItem_IdAndEndIsBefore(userId, itemId, requestTime)
                 .orElseThrow(() ->
-                        new ValidationException(String.format("Пользователь с ID %s не пользовался вещью с ID %s",
-                                userId, itemId)));
+                        new ValidationException(String.format("Пользователь с ID %s не пользовался вещью с ID %s до %s",
+                                userId, itemId, requestTime)));
         return toCommentDto(commentRepository.save(toComment(commentDto, booker, item)));
     }
 
-    // вспомогательный метод получения дат заказов
-    public Map<String, Optional<LocalDateTime>> getBookingDateTime(long itemId) {
-        LocalDateTime requestTime = LocalDateTime.now();
-        List<Booking> booking =
-                bookingRepository.findByItem_IdAndEndIsBeforeOrderByEndAsc(itemId, requestTime);
-        Optional<LocalDateTime> lastBooking = booking.isEmpty()
-                ? Optional.empty() : Optional.of(booking.getLast().getEnd());
-        booking = bookingRepository.findByItem_IdAndStartIsAfterOrderByEndAsc(itemId, requestTime);
-        Optional<LocalDateTime> nextBooking = booking.isEmpty()
-                ? Optional.empty() : Optional.of(booking.getFirst().getEnd());
-        return Map.of("last", lastBooking, "next", nextBooking);
-    }
-
+    // вспомогательный методы
     private User getUser(long userId) {
         return userRepository.findById(userId).orElseThrow(() ->
                 new NotFoundException(String.format("Пользователь с ID %s не найден", userId)));
