@@ -40,11 +40,11 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         // находим список запросов пользователя
         List<ItemRequest> itemRequestList = itemRequestRepository.findByRequestorOrderByCreatedAsc(userId);
         // получаем список ID запросов этго пользователя для запроса соответсвующих ответов - списка вещей
-        List<Long> ItemRequestIdList = itemRequestList.stream()
+        List<Long> itemRequestIdList = itemRequestList.stream()
                 .map(ItemRequest::getId)
                 .toList();
         // получаем соотвесвующий ответ по запрошенным вещам
-        List<Item> itemAnswerInterfaceList = itemRepository.findByRequest_idIn(ItemRequestIdList);
+        List<Item> itemAnswerInterfaceList = itemRepository.findByRequest_idIn(itemRequestIdList);
         // получаю мапу из ID запросов и списков ответов
         Map<Long, List<ItemAnswerDto>> itemAnswerMap = itemAnswerInterfaceList.stream()
                 .collect(groupingBy(item -> item.getRequest().getId(),

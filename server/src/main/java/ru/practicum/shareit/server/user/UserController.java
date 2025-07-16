@@ -1,7 +1,5 @@
 package ru.practicum.shareit.server.user;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.server.user.dto.NewUserDto;
