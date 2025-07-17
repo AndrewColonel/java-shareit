@@ -3,12 +3,12 @@ package ru.practicum.shareit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.user.UserRepository;
-import ru.practicum.shareit.server.user.UserService;
 import ru.practicum.shareit.server.user.UserServiceImpl;
 import ru.practicum.shareit.server.user.dto.NewUserDto;
 import ru.practicum.shareit.server.user.dto.UserDto;
@@ -25,14 +25,15 @@ import static org.mockito.ArgumentMatchers.anyLong;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUnitTests {
 
+    @InjectMocks
+    private UserServiceImpl mockUserServiceImpl;
+
     @Mock
     private UserRepository userRepository;
 
     private User user;
     private NewUserDto newUserDto;
     private List<User> userList;
-    private UserService mockUserServiceImpl;
-    private Optional<User> maybeUser;
     private UserPatchDto userPatchDto;
 
     @BeforeEach
@@ -51,7 +52,6 @@ public class UserServiceUnitTests {
         user.setName("Ms. Cesar Funk");
         user.setEmail("Genesis22@gmail.com");
         userList = List.of(user);
-        maybeUser = Optional.of(user);
         mockUserServiceImpl = new UserServiceImpl(userRepository);
     }
 
@@ -80,7 +80,7 @@ public class UserServiceUnitTests {
     void testfindUserById() {
         Mockito
                 .when(userRepository.findById(1L))
-                .thenReturn(maybeUser);
+                .thenReturn(Optional.of(user));
         assertEquals("Genesis22@gmail.com", mockUserServiceImpl.findUserById(1L).getEmail());
         Mockito
                 .when(userRepository.findById(2L))
@@ -97,7 +97,7 @@ public class UserServiceUnitTests {
     void testUpdateUser() {
         Mockito
                 .when(userRepository.findById(any()))
-                .thenReturn(maybeUser);
+                .thenReturn(Optional.of(user));
         Mockito
                 .when(userRepository.save(any()))
                 .thenReturn(user);
@@ -119,7 +119,7 @@ public class UserServiceUnitTests {
     void testDeleteUser() {
         Mockito
                 .when(userRepository.findById(any()))
-                .thenReturn(maybeUser);
+                .thenReturn(Optional.of(user));
         Mockito
                 .when(userRepository.findById(2L))
                 .thenThrow(new NotFoundException("Пользователь с ID 2 не найден"));

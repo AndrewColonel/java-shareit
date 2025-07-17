@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
             // Может быть выполнено только владельцем вещи.
             isOwner(userId, booking.getItem().getOwner());
             booking.setStatus(approved ? Status.APPROVED : Status.REJECTED);
-        }
+        } else throw new ValidationException(String.format("Бронирование с ID %S уже подтверждено",bookingId));
         return toBookingDto(bookingRepository.save(booking));
     }
 
