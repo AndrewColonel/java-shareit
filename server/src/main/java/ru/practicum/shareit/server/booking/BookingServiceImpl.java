@@ -52,7 +52,7 @@ public class BookingServiceImpl implements BookingService {
             // Может быть выполнено только владельцем вещи.
             isOwner(userId, booking.getItem().getOwner());
             booking.setStatus(approved ? Status.APPROVED : Status.REJECTED);
-        } else throw new ValidationException(String.format("Бронирование с ID %S уже подтверждено",bookingId));
+        } else throw new ValidationException(String.format("Бронирование с ID %S уже подтверждено", bookingId));
         return toBookingDto(bookingRepository.save(booking));
     }
 
@@ -148,14 +148,14 @@ public class BookingServiceImpl implements BookingService {
         List<BookingStateRequestDto> bookingStateRequestDtoList = new ArrayList<>();
         switch (state) {
             case ALL -> {
-                bookingStateRequestDtoList = bookingRepository.findByItemOwner_IdOrderByStartAsc(userId)
+                bookingStateRequestDtoList = bookingRepository.findByItemOwnerOrderByStartAsc(userId)
                         .stream()
                         .map(booking -> toBookingStateRequestDto(booking, requestDateTime))
                         .toList();
             }
 
             case WAITING -> {
-                bookingStateRequestDtoList = bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(userId,
+                bookingStateRequestDtoList = bookingRepository.findByItemOwnerAndStatusIsOrderByStartAsc(userId,
                                 Status.WAITING)
                         .stream()
                         .map(booking -> toBookingStateRequestDto(booking, requestDateTime))
@@ -163,11 +163,11 @@ public class BookingServiceImpl implements BookingService {
             }
             case REJECTED -> {
                 bookingStateRequestDtoList = Stream.concat(
-                        bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(
+                        bookingRepository.findByItemOwnerAndStatusIsOrderByStartAsc(
                                         userId, Status.REJECTED)
                                 .stream()
                                 .map(booking -> toBookingStateRequestDto(booking, requestDateTime)),
-                        bookingRepository.findByItemOwner_IdAndStatusIsOrderByStartAsc(
+                        bookingRepository.findByItemOwnerAndStatusIsOrderByStartAsc(
                                         userId, Status.CANCELED)
                                 .stream()
                                 .map(booking -> toBookingStateRequestDto(booking, requestDateTime))
@@ -176,7 +176,7 @@ public class BookingServiceImpl implements BookingService {
             }
             case CURRENT -> {
                 bookingStateRequestDtoList = bookingRepository
-                        .findByItemOwner_IdAndStatusIsAndEndIsAfterOrderByStartAsc(
+                        .findByItemOwnerAndStatusIsAndEndIsAfterOrderByStartAsc(
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingStateRequestDto(booking, requestDateTime))
@@ -185,7 +185,7 @@ public class BookingServiceImpl implements BookingService {
             }
             case PAST -> {
                 bookingStateRequestDtoList = bookingRepository
-                        .findByItemOwner_IdAndStatusIsAndEndIsBeforeOrderByStartAsc(
+                        .findByItemOwnerAndStatusIsAndEndIsBeforeOrderByStartAsc(
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingStateRequestDto(booking, requestDateTime))
@@ -193,7 +193,7 @@ public class BookingServiceImpl implements BookingService {
             }
             case FUTURE -> {
                 bookingStateRequestDtoList = bookingRepository
-                        .findByItemOwner_IdAndStatusIsAndStartIsAfterOrderByStartAsc(
+                        .findByItemOwnerAndStatusIsAndStartIsAfterOrderByStartAsc(
                                 userId, Status.APPROVED, requestDateTime)
                         .stream()
                         .map(booking -> toBookingStateRequestDto(booking, requestDateTime))

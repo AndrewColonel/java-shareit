@@ -30,21 +30,21 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     // запросные методы для получение данных о бронировании для всех вещей текущего пользователя,включая его статус
     // здесь нужен запрос не ByBooker_Id, а ByItem_Owner_Id
-    List<Booking> findByItemOwner_IdOrderByStartAsc(long bookerId);
+    List<Booking> findByItemOwnerOrderByStartAsc(long bookerId);
 
-    List<Booking> findByItemOwner_IdAndStatusIsOrderByStartAsc(long bookerId, Status status);
+    List<Booking> findByItemOwnerAndStatusIsOrderByStartAsc(long bookerId, Status status);
 
     // CURRENT
-    List<Booking> findByItemOwner_IdAndStatusIsAndEndIsAfterOrderByStartAsc(long bookerId, Status status,
-                                                                            LocalDateTime requestDateTime);
+    List<Booking> findByItemOwnerAndStatusIsAndEndIsAfterOrderByStartAsc(long bookerId, Status status,
+                                                                         LocalDateTime requestDateTime);
 
     // PAST
-    List<Booking> findByItemOwner_IdAndStatusIsAndEndIsBeforeOrderByStartAsc(long bookerId, Status status,
-                                                                             LocalDateTime requestDateTime);
+    List<Booking> findByItemOwnerAndStatusIsAndEndIsBeforeOrderByStartAsc(long bookerId, Status status,
+                                                                          LocalDateTime requestDateTime);
 
     // FUTURE
-    List<Booking> findByItemOwner_IdAndStatusIsAndStartIsAfterOrderByStartAsc(long bookerId, Status status,
-                                                                              LocalDateTime requestDateTime);
+    List<Booking> findByItemOwnerAndStatusIsAndStartIsAfterOrderByStartAsc(long bookerId, Status status,
+                                                                           LocalDateTime requestDateTime);
 
     // запросные методы для ItemService
     List<Booking> findByItem_IdAndEndIsBeforeOrderByEndAsc(Long itemId, LocalDateTime end);
