@@ -1,4 +1,4 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.server;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,11 +10,9 @@ import ru.practicum.shareit.server.booking.BookingRepository;
 import ru.practicum.shareit.server.booking.Status;
 import ru.practicum.shareit.server.booking.model.Booking;
 import ru.practicum.shareit.server.exception.NotFoundException;
+import ru.practicum.shareit.server.exception.ValidationException;
 import ru.practicum.shareit.server.item.*;
-import ru.practicum.shareit.server.item.dto.CommentDto;
-import ru.practicum.shareit.server.item.dto.ItemDto;
-import ru.practicum.shareit.server.item.dto.ItemPatchDto;
-import ru.practicum.shareit.server.item.dto.NewItemDto;
+import ru.practicum.shareit.server.item.dto.*;
 import ru.practicum.shareit.server.item.model.Comment;
 import ru.practicum.shareit.server.item.model.Item;
 import ru.practicum.shareit.server.request.ItemRequestRepository;
@@ -22,12 +20,13 @@ import ru.practicum.shareit.server.user.UserRepository;
 import ru.practicum.shareit.server.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.hamcrest.MatcherAssert.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -53,6 +52,7 @@ public class ItemServiceUnitTests {
 
     private static final Long USER_ID1 = 1L;
     private static final Long USER_ID2 = 2L;
+    private static final Long USER_ID3 = 3L;
     private static final Long ITEM_ID1 = 1L;
     private static final Long ITEM_ID2 = 2L;
 
@@ -63,18 +63,23 @@ public class ItemServiceUnitTests {
     private ItemPatchDto itemPatchDto;
 
     private User user;
+    private User owner;
 
     private Comment comment;
     private CommentDto commentDto;
 
     private Booking booking;
 
+    private LocalDateTime now;
+
     @BeforeEach
     void setup() {
+        now = LocalDateTime.now();
+
         item = new Item();
-        item.setId(1L);
+        item.setId(ITEM_ID1);
         item.setName("nh3ko8vqPe");
-        item.setOwner(1L);
+        item.setOwner(USER_ID3);
         item.setDescription("2MG5XYEtjFlTTOweF1NRd4PrTgjWI7XRWWbSMw8DbEDEjWdWhh");
         item.setAvailable(true);
 
@@ -85,9 +90,14 @@ public class ItemServiceUnitTests {
                 .build();
 
         user = new User();
-        user.setId(1);
+        user.setId(USER_ID1);
         user.setName("Ms. Cesar Funk");
         user.setEmail("Genesis22@gmail.com");
+
+        owner = new User();
+        owner.setId(USER_ID3);
+        owner.setName("Bob");
+        owner.setEmail("bob@example.com");
 
         itemPatchDto = ItemPatchDto.builder()
                 .name("Ms. Cesar Funk")
@@ -125,7 +135,7 @@ public class ItemServiceUnitTests {
     }
 
     @Test
-    void testCreateItem() {
+    void testCreateItem_success() {
 
         when(itemRepository.save(any()))
                 .thenReturn(item);
@@ -152,11 +162,22 @@ public class ItemServiceUnitTests {
     }
 
     @Test
-    void testUpdateItem() {
+    void testCreateItem_userNotFound_throwsNotFoundException() {
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () ->
+                itemServiceImpl.createItem(999L, newItemDto));
+    }
+
+
+
+    @Test
+    void testUpdateItem_success() {
         when(itemRepository.save(any()))
                 .thenReturn(item);
         when(userRepository.findById(USER_ID1))
                 .thenReturn(Optional.of(user));
+        when(userRepository.findById(USER_ID3))
+                .thenReturn(Optional.of(owner));
         when(itemRepository.findById(ITEM_ID1))
                 .thenReturn(Optional.of(item));
         when(itemRepository.findById(ITEM_ID2))
@@ -170,7 +191,7 @@ public class ItemServiceUnitTests {
                 NotFoundException.class,
                 () -> itemServiceImpl.updateItem(USER_ID1, ITEM_ID2, itemPatchDto));
 
-        ItemDto itemDto = (itemServiceImpl.updateItem(USER_ID1, ITEM_ID1, itemPatchDto));
+        ItemDto itemDto = (itemServiceImpl.updateItem(USER_ID3, ITEM_ID1, itemPatchDto));
         assertThat(itemDto.getId(), notNullValue());
         assertThat(itemDto.getName(), equalTo(item.getName()));
         assertThat(itemDto.getDescription(), equalTo(item.getDescription()));
@@ -178,6 +199,50 @@ public class ItemServiceUnitTests {
 
         assertEquals("Пользователь с ID 2 не найден", exceptionUser.getMessage());
         assertEquals("Вещь с ID 2 не найдена", exceptionItem.getMessage());
+    }
+
+    @Test
+    void testUpdateItem_notOwner_throwsNotFoundException() {
+        itemPatchDto.setName("Improved Drill");
+        when(userRepository.findById(USER_ID1)).thenReturn(Optional.of(user));
+        when(itemRepository.findById(ITEM_ID1)).thenReturn(Optional.of(item));
+        assertThrows(ValidationException.class, () ->
+                itemServiceImpl.updateItem(USER_ID1, ITEM_ID1, itemPatchDto));
+    }
+
+    @Test
+    void testFindAllItems_success() {
+        List<Item> itemList = List.of(item);
+        List<Long> itemIdList = List.of(item.getId());
+
+        when(userRepository.findById(owner.getId())).thenReturn(Optional.of(owner));
+        when(itemRepository.findByOwner(owner.getId())).thenReturn(itemList);
+        when(bookingRepository.findByItem_IdInOrderByStartAsc(itemIdList)).thenReturn(List.of());
+        when(commentRepository.findByItem_IdInOrderByCreatedAsc(itemIdList)).thenReturn(List.of());
+
+        Collection<ItemOwnerViewingDto> result = itemServiceImpl.findAllItems(owner.getId());
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
+
+    @Test
+    void testSearchItems_success() {
+        when(itemRepository.search("Drill")).thenReturn(List.of(item));
+
+        Collection<ItemDto> result = itemServiceImpl.searchItems("Drill");
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testSearchItems_emptyQuery_returnsEmpty() {
+        Collection<ItemDto> result = itemServiceImpl.searchItems("   ");
+        assertTrue(result.isEmpty());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package ru.practicum.shareit;
+package ru.practicum.shareit.server;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
-public class ItemRequestServiceTests {
+public class ItemRequestServiceUnitTests {
 
     @InjectMocks
     private ItemRequestServiceImpl itemRequestService;
@@ -149,7 +149,7 @@ public class ItemRequestServiceTests {
         assertEquals(REQUEST_ID, result.getId());
         assertEquals("Need a drill", result.getDescription());
         assertEquals(1, result.getItems().size());
-        assertEquals("Drill", result.getItems().get(0).getName());
+        assertEquals("Drill", result.getItems().getFirst().getName());
     }
 
     @Test
