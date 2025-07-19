@@ -104,6 +104,14 @@ public class ItemServiceIntegrationTests {
     }
 
     @Test
+    void testCreateItem_requestNotFound() {
+        newItemDto.setRequestId(1L);
+
+        assertThrows(NotFoundException.class, () ->
+                itemService.createItem(owner.getId(), newItemDto));
+    }
+
+    @Test
     void testCreateItem_userNotFound_throwsNotFoundException() {
 
         assertThrows(NotFoundException.class, () ->
@@ -153,6 +161,17 @@ public class ItemServiceIntegrationTests {
     }
 
     @Test
+    void testFindAllItems_success_branch1() {
+        ItemDto itemDto = itemService.createItem(owner.getId(), newItemDto);
+        List<ItemOwnerViewingDto> result = itemService.findAllItems(user.getId()).stream().toList();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+        assertEquals(0, result.size());
+
+    }
+
+    @Test
     void testSearchItems_success() {
         ItemDto itemDto = itemService.createItem(owner.getId(), newItemDto);
         Collection<ItemDto> result = itemService.searchItems("Saw");
@@ -189,4 +208,20 @@ public class ItemServiceIntegrationTests {
         assertThrows(ValidationException.class, () ->
                 itemService.createComment(owner.getId(), itemDto.getId(), commentDto));
     }
+
+    @Test
+    void testFindAllItems_success_branch2() {
+        ItemDto itemDto = itemService.createItem(owner.getId(), newItemDto);
+        newBookingDto.setItemId(itemDto.getId());
+        BookingDto bookingDto = bookingService.createBooking(user.getId(), newBookingDto);
+        CommentDto commnet = itemService.createComment(user.getId(), itemDto.getId(), commentDto);
+        List<ItemOwnerViewingDto> result = itemService.findAllItems(itemDto.getOwner()).stream().toList();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+
+
+    }
+
 }

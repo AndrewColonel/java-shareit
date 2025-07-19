@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.server.booking.BookingRepository;
 import ru.practicum.shareit.server.booking.BookingService;
@@ -45,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.*;
         properties = "jdbc.url=jdbc:postgresql://localhost:5432/test",
         webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class BookingServiceIntegrationTests {
 
     private final EntityManager em;
@@ -203,6 +205,57 @@ public class BookingServiceIntegrationTests {
         assertFalse(resultBooker.isEmpty());
         assertEquals(1, resultBooker.size());
         assertEquals("WAITING", resultBooker.getFirst().getStatus().name());
+    }
+
+    @Test
+    void testFindAllOwnerBookings_stateAll_success() {
+        bookingService.createBooking(user.getId(), newBookingDto);
+        List<BookingStateRequestDto> result =
+                bookingService.findAllOwnerBooking(owner.getId(), "ALL").stream().toList();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    void testFindAllBookings_stateRejected_success() {
+        BookingDto booking = bookingService.createBooking(user.getId(), newBookingDto);
+        BookingDto updated = bookingService.updateBooking(owner.getId(), booking.getId(), false);
+//        bookingService.createBooking(user.getId(), newBookingDto);
+        List<BookingStateRequestDto> resultBooker =
+                bookingService.findAllBookings(user.getId(), "REJECTED").stream().toList();
+
+        assertNotNull(resultBooker);
+        assertFalse(resultBooker.isEmpty());
+        assertEquals(1, resultBooker.size());
+        assertEquals("REJECTED", resultBooker.getFirst().getStatus().name());
+    }
+
+    @Test
+    void testFindAllOwnerBookings_stateWaiting_success() {
+        BookingDto bookingCurrent = bookingService.createBooking(user.getId(), newBookingDto);
+//        bookingService.updateBooking(owner.getId(), bookingCurrent.getId(), true);
+
+        List<BookingStateRequestDto> result =
+                bookingService.findAllOwnerBooking(owner.getId(), "WAITING").stream().toList();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals("WAITING", result.getFirst().getStatus().name());
+    }
+
+    @Test
+    void testFindAllOwnerBookings_stateRejected_success() {
+        BookingDto bookingCurrent = bookingService.createBooking(user.getId(), newBookingDto);
+        bookingService.updateBooking(owner.getId(), bookingCurrent.getId(), false);
+
+        List<BookingStateRequestDto> result =
+                bookingService.findAllOwnerBooking(owner.getId(), "REJECTED").stream().toList();
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        assertEquals("REJECTED", result.getFirst().getStatus().name());
     }
 
     @Test
