@@ -67,27 +67,26 @@ public class BookingDtoJsonTest {
     @Test
     void testDeserializeBookingDto() throws Exception {
         // Тестовый JSON
-        String json = """
-                {
-                    "id": 200,
-                    "start": "2025-04-05T10:00:00",
-                    "end": "2025-04-05T12:00:00",
-                    "item": {
-                        "id": 1,
-                        "name": "Drill",
-                        "description": "Powerful drill",
-                        "available": true,
-                        "owner": 100,
-                        "requestId": 1000
-                    },
-                    "booker": {
-                        "id": 100,
-                        "name": "Alice",
-                        "email": "alice@example.com"
-                    },
-                    "status": "APPROVED"
-                }
-                """;
+        //  задано правило Leading braces { (фигурная скобка на той же строке, что и ключевое слово ....0))))))
+        String json = "{\n" +
+                "    \"id\": 200,\n" +
+                "    \"start\": \"2025-04-05T10:00:00\",\n" +
+                "    \"end\": \"2025-04-05T12:00:00\",\n" +
+                "    \"item\": {\n" +
+                "        \"id\": 1,\n" +
+                "        \"name\": \"Drill\",\n" +
+                "        \"description\": \"Powerful drill\",\n" +
+                "        \"available\": true,\n" +
+                "        \"owner\": 100,\n" +
+                "        \"requestId\": 1000\n" +
+                "    },\n" +
+                "    \"booker\": {\n" +
+                "        \"id\": 100,\n" +
+                "        \"name\": \"Alice\",\n" +
+                "        \"email\": \"alice@example.com\"\n" +
+                "    },\n" +
+                "    \"status\": \"APPROVED\"\n" +
+                "}";
 
         // Десериализуем JSON в BookingDto
         BookingDto bookingDto = jsonTester.parseObject(json);
@@ -111,14 +110,12 @@ public class BookingDtoJsonTest {
     @Test
     void testDeserializeBookingDtoWithNullFields() throws Exception {
         // JSON с null-полями
-        String json = """
-                {
-                    "id": 200,
-                    "start": "2025-04-05T10:00:00",
-                    "end": "2025-04-05T12:00:00",
-                    "status": "WAITING"
-                }
-                """;
+        String json = "{"
+                + "\"id\": 200,"
+                + "\"start\": \"2025-04-05T10:00:00\","
+                + "\"end\": \"2025-04-05T12:00:00\","
+                + "\"status\": \"WAITING\""
+                + "}";
 
         // Десериализуем JSON в BookingDto
         BookingDto bookingDto = jsonTester.parseObject(json);

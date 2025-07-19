@@ -16,7 +16,7 @@ import java.io.IOException;
 public class UserDtoJsonTest {
 
     // Инициализируем JacksonTester для UserDto
-    private final JacksonTester<UserDto> jsonTester ;
+    private final JacksonTester<UserDto> jsonTester;
 
     @Test
     void testSerializeUserDto() throws IOException {
@@ -40,13 +40,11 @@ public class UserDtoJsonTest {
     @Test
     void testDeserializeUserDto() throws IOException {
         // Тестовый JSON
-        String json = """
-        {
-            "id": 1,
-            "name": "Alice",
-            "email": "alice@example.com"
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 1,\n"
+                + "    \"name\": \"Alice\",\n"
+                + "    \"email\": \"alice@example.com\"\n"
+                + "}";
 
         // Десериализуем JSON в объект UserDto
         UserDto userDto = jsonTester.parseObject(json);
@@ -60,13 +58,11 @@ public class UserDtoJsonTest {
     @Test
     void testDeserializeUserDtoWithNullFields() throws IOException {
         // Тестовый JSON с null значениями
-        String json = """
-        {
-            "id": 1,
-            "name": null,
-            "email": null
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 1,\n"
+                + "    \"name\": null,\n"
+                + "    \"email\": null\n"
+                + "}";
 
         // Десериализуем JSON
         UserDto userDto = jsonTester.parseObject(json);
@@ -79,12 +75,9 @@ public class UserDtoJsonTest {
     @Test
     void testDeserializeUserDtoWithMissingFields() throws IOException {
         // Тестовый JSON без поля name и email
-        String json = """
-        {
-            "id": 1
-        }
-        """;
-
+        String json = "{\n"
+                + "    \"id\": 1\n"
+                + "}";
         // Десериализуем JSON
         UserDto userDto = jsonTester.parseObject(json);
 
@@ -96,13 +89,11 @@ public class UserDtoJsonTest {
     @Test
     void testDeserializeUserDtoWithEmptyStringFields() throws IOException {
         // Тестовый JSON с пустыми строками
-        String json = """
-        {
-            "id": 1,
-            "name": "",
-            "email": ""
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 1,\n"
+                + "    \"name\": \"\",\n"
+                + "    \"email\": \"\"\n"
+                + "}";
 
         // Десериализуем JSON
         UserDto userDto = jsonTester.parseObject(json);

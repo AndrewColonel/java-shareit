@@ -51,19 +51,17 @@ public class ItemRequestAnswerDtoJsonTest {
     @Test
     void testDeserializeItemRequestAnswerDto() throws Exception {
         // Тестовый JSON с вложенным ItemAnswerDto
-        String json = """
-        {
-            "id": 100,
-            "description": "Need a drill",
-            "created": "2025-04-05T10:00:00",
-            "items": [
-                {
-                    "id": 1,
-                    "name": "Drill"
-                }
-            ]
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 100,\n"
+                + "    \"description\": \"Need a drill\",\n"
+                + "    \"created\": \"2025-04-05T10:00:00\",\n"
+                + "    \"items\": [\n"
+                + "        {\n"
+                + "            \"id\": 1,\n"
+                + "            \"name\": \"Drill\"\n"
+                + "        }\n"
+                + "    ]\n"
+                + "}";
 
         // Десериализуем JSON в объект ItemRequestAnswerDto
         ItemRequestAnswerDto dto = jsonTester.parseObject(json);
@@ -83,14 +81,12 @@ public class ItemRequestAnswerDtoJsonTest {
     @Test
     void testDeserializeWithNullItems() throws Exception {
         // Тестовый JSON с null в поле items
-        String json = """
-        {
-            "id": 100,
-            "description": "Need a drill",
-            "created": "2025-04-05T10:00:00",
-            "items": null
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 100,\n"
+                + "    \"description\": \"Need a drill\",\n"
+                + "    \"created\": \"2025-04-05T10:00:00\",\n"
+                + "    \"items\": null\n"
+                + "}";
 
         // Десериализуем JSON
         ItemRequestAnswerDto dto = jsonTester.parseObject(json);
@@ -102,13 +98,11 @@ public class ItemRequestAnswerDtoJsonTest {
     @Test
     void testDeserializeWithMissingItemsField() throws Exception {
         // Тестовый JSON без поля items
-        String json = """
-        {
-            "id": 100,
-            "description": "Need a drill",
-            "created": "2025-04-05T10:00:00"
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 100,\n"
+                + "    \"description\": \"Need a drill\",\n"
+                + "    \"created\": \"2025-04-05T10:00:00\"\n"
+                + "}";
 
         // Десериализуем JSON
         ItemRequestAnswerDto dto = jsonTester.parseObject(json);
@@ -120,14 +114,12 @@ public class ItemRequestAnswerDtoJsonTest {
     @Test
     void testDeserializeWithEmptyItemsList() throws Exception {
         // Тестовый JSON с пустым списком items
-        String json = """
-        {
-            "id": 100,
-            "description": "Need a drill",
-            "created": "2025-04-05T10:00:00",
-            "items": []
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 100,\n"
+                + "    \"description\": \"Need a drill\",\n"
+                + "    \"created\": \"2025-04-05T10:00:00\",\n"
+                + "    \"items\": []\n"
+                + "}";
 
         // Десериализуем JSON
         ItemRequestAnswerDto dto = jsonTester.parseObject(json);

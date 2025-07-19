@@ -46,16 +46,14 @@ public class ItemDtoJsonTest {
     @Test
     void testDeserializeItemDto() throws IOException {
         // Тестовый JSON
-        String json = """
-        {
-            "id": 1,
-            "name": "Drill",
-            "description": "Powerful electric drill",
-            "available": true,
-            "owner": 100,
-            "requestId": 1000
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 1,\n"
+                + "    \"name\": \"Drill\",\n"
+                + "    \"description\": \"Powerful electric drill\",\n"
+                + "    \"available\": true,\n"
+                + "    \"owner\": 100,\n"
+                + "    \"requestId\": 1000\n"
+                + "}";
 
         // Десериализуем JSON в объект ItemDto
         ItemDto itemDto = jsonTester.parseObject(json);
@@ -72,15 +70,13 @@ public class ItemDtoJsonTest {
     @Test
     void testDeserializeItemDtoWithNullRequestId() throws IOException {
         // Тестовый JSON с null в requestId
-        String json = """
-        {
-            "id": 1,
-            "name": "Drill",
-            "description": "Powerful electric drill",
-            "available": true,
-            "owner": 100
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 1,\n"
+                + "    \"name\": \"Drill\",\n"
+                + "    \"description\": \"Powerful electric drill\",\n"
+                + "    \"available\": true,\n"
+                + "    \"owner\": 100\n"
+                + "}";
 
         // Десериализуем JSON в объект ItemDto
         ItemDto itemDto = jsonTester.parseObject(json);
@@ -92,15 +88,13 @@ public class ItemDtoJsonTest {
     @Test
     void testDeserializeItemDtoWithNullAvailable() throws IOException {
         // Тестовый JSON с null в available
-        String json = """
-        {
-            "id": 1,
-            "name": "Drill",
-            "description": "Powerful electric drill",
-            "available": null,
-            "owner": 100
-        }
-        """;
+        String json = "{\n"
+                + "    \"id\": 1,\n"
+                + "    \"name\": \"Drill\",\n"
+                + "    \"description\": \"Powerful electric drill\",\n"
+                + "    \"available\": null,\n"
+                + "    \"owner\": 100\n"
+                + "}";
 
         // Десериализуем JSON в объект ItemDto
         ItemDto itemDto = jsonTester.parseObject(json);
