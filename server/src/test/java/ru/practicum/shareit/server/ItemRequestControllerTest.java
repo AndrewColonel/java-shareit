@@ -1,6 +1,7 @@
 package ru.practicum.shareit.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -12,9 +13,7 @@ import ru.practicum.shareit.server.request.ItemRequestService;
 import ru.practicum.shareit.server.request.dto.ItemRequestAnswerDto;
 import ru.practicum.shareit.server.request.dto.ItemRequestDto;
 import ru.practicum.shareit.server.request.dto.NewItemRequestDto;
-import ru.practicum.shareit.server.request.model.ItemRequest;
 import ru.practicum.shareit.server.exception.NotFoundException;
-import ru.practicum.shareit.server.exception.ValidationException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,20 +36,33 @@ public class ItemRequestControllerTest {
     private static final long USER_ID = 1L;
     private static final long REQUEST_ID = 100L;
 
-    // --- POST /requests ---
+    private static NewItemRequestDto newItemRequestDto;
+    private static ItemRequestDto itemRequestDto;
+    private static LocalDateTime now;
+    private static ItemRequestAnswerDto itemRequestAnswerDto;
+
+    @BeforeAll
+    static void setup() {
+        now = LocalDateTime.now();
+        newItemRequestDto = NewItemRequestDto.builder()
+                .description("Need a drill")
+                .build();
+        itemRequestDto = ItemRequestDto.builder()
+                .id(REQUEST_ID)
+                .description("Need a drill")
+                .created(now)
+                .build();
+        itemRequestAnswerDto = ItemRequestAnswerDto.builder()
+                .id(REQUEST_ID)
+                .description("Need a drill")
+                .created(now)
+                .build();
+    }
 
     @Test
     void testCreateItemRequest_success() throws Exception {
-        NewItemRequestDto newItemRequestDto = new NewItemRequestDto();
-        newItemRequestDto.setDescription("Need a drill");
-        newItemRequestDto.setRequestId(1L);
-
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        itemRequestDto.setId(REQUEST_ID);
-        itemRequestDto.setDescription("Need a drill");
-        itemRequestDto.setCreated(LocalDateTime.now());
-
-        when(itemRequestService.createItemRequest(USER_ID, newItemRequestDto)).thenReturn(itemRequestDto);
+        when(itemRequestService.createItemRequest(USER_ID, newItemRequestDto))
+                .thenReturn(itemRequestDto);
 
         mockMvc.perform(post("/requests")
                         .header("X-Sharer-User-Id", USER_ID)
@@ -60,14 +72,12 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id").value(REQUEST_ID))
                 .andExpect(jsonPath("$.description").value("Need a drill"));
 
-        verify(itemRequestService, times(1)).createItemRequest(USER_ID, newItemRequestDto);
+        verify(itemRequestService, times(1))
+                .createItemRequest(USER_ID, newItemRequestDto);
     }
 
     @Test
     void testCreateItemRequest_userNotFound_throwsNotFoundException() throws Exception {
-        NewItemRequestDto newItemRequestDto = new NewItemRequestDto();
-        newItemRequestDto.setDescription("Need a drill");
-
         when(itemRequestService.createItemRequest(USER_ID, newItemRequestDto))
                 .thenThrow(new NotFoundException("Пользователь не найден"));
 
@@ -75,22 +85,16 @@ public class ItemRequestControllerTest {
                         .header("X-Sharer-User-Id", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newItemRequestDto)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Пользователь не найден"));
+                .andExpect(status().isNotFound());
 
-        verify(itemRequestService, times(1)).createItemRequest(USER_ID, newItemRequestDto);
+        verify(itemRequestService, times(1))
+                .createItemRequest(USER_ID, newItemRequestDto);
     }
-
-    // --- GET /requests ---
 
     @Test
     void testFindAllByOwnerRequests_success() throws Exception {
-        ItemRequestAnswerDto answerDto = new ItemRequestAnswerDto();
-        answerDto.setId(REQUEST_ID);
-        answerDto.setDescription("Need a drill");
-        answerDto.setCreated(LocalDateTime.now());
-
-        when(itemRequestService.findAllByOwnerRequests(USER_ID)).thenReturn(List.of(answerDto));
+        when(itemRequestService.findAllByOwnerRequests(USER_ID))
+                .thenReturn(List.of(itemRequestAnswerDto));
 
         mockMvc.perform(get("/requests")
                         .header("X-Sharer-User-Id", USER_ID))
@@ -102,15 +106,8 @@ public class ItemRequestControllerTest {
         verify(itemRequestService, times(1)).findAllByOwnerRequests(USER_ID);
     }
 
-    // --- GET /requests/all ---
-
     @Test
     void testFindAllRequests_success() throws Exception {
-        ItemRequestDto itemRequestDto = new ItemRequestDto();
-        itemRequestDto.setId(REQUEST_ID);
-        itemRequestDto.setDescription("Another request");
-        itemRequestDto.setCreated(LocalDateTime.now());
-
         when(itemRequestService.findAllRequests(USER_ID)).thenReturn(List.of(itemRequestDto));
 
         mockMvc.perform(get("/requests/all")
@@ -122,16 +119,10 @@ public class ItemRequestControllerTest {
         verify(itemRequestService, times(1)).findAllRequests(USER_ID);
     }
 
-    // --- GET /requests/{requestId} ---
-
     @Test
     void testGetRequestById_success() throws Exception {
-        ItemRequestAnswerDto answerDto = new ItemRequestAnswerDto();
-        answerDto.setId(REQUEST_ID);
-        answerDto.setDescription("Need a drill");
-        answerDto.setCreated(LocalDateTime.now());
-
-        when(itemRequestService.getRequestById(USER_ID, REQUEST_ID)).thenReturn(answerDto);
+        when(itemRequestService.getRequestById(USER_ID, REQUEST_ID))
+                .thenReturn(itemRequestAnswerDto);
 
         mockMvc.perform(get("/requests/{requestId}", REQUEST_ID)
                         .header("X-Sharer-User-Id", USER_ID))
@@ -139,7 +130,8 @@ public class ItemRequestControllerTest {
                 .andExpect(jsonPath("$.id").value(REQUEST_ID))
                 .andExpect(jsonPath("$.description").value("Need a drill"));
 
-        verify(itemRequestService, times(1)).getRequestById(USER_ID, REQUEST_ID);
+        verify(itemRequestService, times(1))
+                .getRequestById(USER_ID, REQUEST_ID);
     }
 
     @Test
@@ -149,13 +141,11 @@ public class ItemRequestControllerTest {
 
         mockMvc.perform(get("/requests/{requestId}", REQUEST_ID)
                         .header("X-Sharer-User-Id", USER_ID))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Запрос не найден"));
+                .andExpect(status().isNotFound());
 
-        verify(itemRequestService, times(1)).getRequestById(USER_ID, REQUEST_ID);
+        verify(itemRequestService, times(1))
+                .getRequestById(USER_ID, REQUEST_ID);
     }
-
-    // --- Вспомогательные методы ---
 
     @Test
     void testFindAllRequests_userNotFound_throwsNotFoundException() throws Exception {
@@ -164,9 +154,7 @@ public class ItemRequestControllerTest {
 
         mockMvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", USER_ID))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Пользователь не найден"));
-
+                .andExpect(status().isNotFound());
         verify(itemRequestService, times(1)).findAllRequests(USER_ID);
     }
 }

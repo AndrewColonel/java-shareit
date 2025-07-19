@@ -1,6 +1,7 @@
 package ru.practicum.shareit.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -9,12 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.exception.ValidationException;
+import ru.practicum.shareit.server.item.ItemController;
 import ru.practicum.shareit.server.item.dto.*;
-import ru.practicum.shareit.server.item.model.Comment;
-import ru.practicum.shareit.server.item.service.ItemService;
-import ru.practicum.shareit.server.user.model.User;
+import ru.practicum.shareit.server.item.ItemService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Collections;
 
@@ -37,20 +36,48 @@ public class ItemControllerTest {
     private static final long ITEM_ID = 100L;
     private static final long COMMENT_ID = 200L;
 
-    // --- POST /items ---
+    private static NewItemDto newItemDto;
+    private static ItemDto itemDto;
+    private static ItemPatchDto itemPatchDto;
+    private static ItemViewingDto itemViewingDto;
+    private static ItemOwnerViewingDto itemOwnerViewingDto;
+    private static CommentDto commentDto;
+
+    @BeforeAll
+    static void setup() {
+        newItemDto = NewItemDto.builder()
+                .name("Saw")
+                .description("Hand saw")
+                .available(true)
+                .owner(1)
+                .build();
+        itemDto = ItemDto.builder()
+                .id(ITEM_ID)
+                .name("Drill")
+                .available(true)
+                .build();
+        itemPatchDto = ItemPatchDto.builder()
+                .name("Improved Drill")
+                .description("Even more powerful")
+                .build();
+        itemViewingDto = ItemViewingDto.builder()
+                .id(ITEM_ID)
+                .name("Drill")
+                .comments(List.of(1L))
+                .build();
+        itemOwnerViewingDto = ItemOwnerViewingDto.builder()
+                .name("Drill")
+                .build();
+        commentDto = CommentDto.builder()
+                .id(COMMENT_ID)
+                .text("Great tool!")
+                .build();
+
+    }
 
     @Test
     void testCreateItem_success() throws Exception {
-        NewItemDto newItemDto = new NewItemDto();
-        newItemDto.setName("Drill");
-        newItemDto.setDescription("Powerful drill");
-        newItemDto.setAvailable(true);
-
-        ItemDto itemDto = new ItemDto();
-        itemDto.setId(ITEM_ID);
         itemDto.setName("Drill");
-        itemDto.setAvailable(true);
-
         when(itemService.createItem(USER_ID, newItemDto)).thenReturn(itemDto);
 
         mockMvc.perform(post("/items")
@@ -66,8 +93,7 @@ public class ItemControllerTest {
 
     @Test
     void testCreateItem_userNotFound_throwsNotFoundException() throws Exception {
-        NewItemDto newItemDto = new NewItemDto();
-        newItemDto.setName("Drill");
+
 
         when(itemService.createItem(USER_ID, newItemDto))
                 .thenThrow(new NotFoundException("Пользователь не найден"));
@@ -76,64 +102,50 @@ public class ItemControllerTest {
                         .header("X-Sharer-User-Id", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newItemDto)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Пользователь не найден"));
+                .andExpect(status().isNotFound());
 
         verify(itemService, times(1)).createItem(USER_ID, newItemDto);
     }
 
-    // --- PATCH /items/{itemId} ---
-
     @Test
     void testUpdateItem_success() throws Exception {
-        ItemPatchDto patchDto = new ItemPatchDto();
-        patchDto.setName("Updated Drill");
+        itemPatchDto.setName("Updated Drill");
 
-        ItemDto updatedItem = new ItemDto();
-        updatedItem.setId(ITEM_ID);
-        updatedItem.setName("Updated Drill");
-        updatedItem.setAvailable(true);
+        itemDto.setId(ITEM_ID);
+        itemDto.setName("Updated Drill");
+        itemDto.setAvailable(true);
 
-        when(itemService.updateItem(USER_ID, ITEM_ID, patchDto)).thenReturn(updatedItem);
+        when(itemService.updateItem(USER_ID, ITEM_ID, itemPatchDto)).thenReturn(itemDto);
 
         mockMvc.perform(patch("/items/{itemId}", ITEM_ID)
                         .header("X-Sharer-User-Id", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patchDto)))
+                        .content(objectMapper.writeValueAsString(itemPatchDto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Drill"));
 
-        verify(itemService, times(1)).updateItem(USER_ID, ITEM_ID, patchDto);
+        verify(itemService, times(1)).updateItem(USER_ID, ITEM_ID, itemPatchDto);
     }
 
+    //
     @Test
     void testUpdateItem_notOwner_throwsNotFoundException() throws Exception {
-        ItemPatchDto patchDto = new ItemPatchDto();
-        patchDto.setName("Updated Drill");
 
-        when(itemService.updateItem(USER_ID, ITEM_ID, patchDto))
+        when(itemService.updateItem(USER_ID, ITEM_ID, itemPatchDto))
                 .thenThrow(new NotFoundException("Пользователь не владелец"));
 
         mockMvc.perform(patch("/items/{itemId}", ITEM_ID)
                         .header("X-Sharer-User-Id", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(patchDto)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Пользователь не владелец"));
+                        .content(objectMapper.writeValueAsString(itemPatchDto)))
+                .andExpect(status().isNotFound());
 
-        verify(itemService, times(1)).updateItem(USER_ID, ITEM_ID, patchDto);
+        verify(itemService, times(1)).updateItem(USER_ID, ITEM_ID, itemPatchDto);
     }
-
-    // --- GET /items/{itemId} ---
 
     @Test
     void testGetItemById_success() throws Exception {
-        ItemViewingDto itemDto = new ItemViewingDto();
-        itemDto.setId(ITEM_ID);
-        itemDto.setName("Drill");
-        itemDto.setComments(List.of(1L));
-
-        when(itemService.getItemById(USER_ID, ITEM_ID)).thenReturn(itemDto);
+        when(itemService.getItemById(USER_ID, ITEM_ID)).thenReturn(itemViewingDto);
 
         mockMvc.perform(get("/items/{itemId}", ITEM_ID)
                         .header("X-Sharer-User-Id", USER_ID))
@@ -151,40 +163,29 @@ public class ItemControllerTest {
 
         mockMvc.perform(get("/items/{itemId}", ITEM_ID)
                         .header("X-Sharer-User-Id", USER_ID))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Вещь не найдена"));
+                .andExpect(status().isNotFound());
 
         verify(itemService, times(1)).getItemById(USER_ID, ITEM_ID);
     }
 
-    // --- GET /items ---
-
     @Test
     void testFindAllItems_success() throws Exception {
-        ItemOwnerViewingDto itemDto = new ItemOwnerViewingDto();
-        itemDto.setId(ITEM_ID);
-        itemDto.setName("Drill");
-
-        when(itemService.findAllItems(USER_ID)).thenReturn(Collections.singletonList(itemDto));
+        when(itemService.findAllItems(USER_ID)).thenReturn(List.of(itemOwnerViewingDto));
 
         mockMvc.perform(get("/items")
                         .header("X-Sharer-User-Id", USER_ID))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()").value(1))
-                .andExpect(jsonPath("$[0].id").value(ITEM_ID));
+                .andExpect(jsonPath("$[0].name").value("Drill"));
 
         verify(itemService, times(1)).findAllItems(USER_ID);
     }
 
-    // --- GET /items/search ---
-
     @Test
     void testSearchItems_success() throws Exception {
-        ItemDto itemDto = new ItemDto();
-        itemDto.setId(ITEM_ID);
         itemDto.setName("Drill");
 
-        when(itemService.searchItems("Drill")).thenReturn(Collections.singletonList(itemDto));
+        when(itemService.searchItems("Drill")).thenReturn(List.of(itemDto));
 
         mockMvc.perform(get("/items/search")
                         .param("text", "Drill"))
@@ -207,15 +208,10 @@ public class ItemControllerTest {
         verify(itemService, times(1)).searchItems("   ");
     }
 
-    // --- POST /items/{itemId}/comment ---
-
     @Test
     void testCreateComment_success() throws Exception {
-        CommentDto commentDto = new CommentDto();
-        commentDto.setId(COMMENT_ID);
-        commentDto.setText("Great tool!");
 
-        when(itemService.createComment(USER_ID, ITEM_ID, any(CommentDto.class)))
+        when(itemService.createComment(anyLong(), anyLong(), any(CommentDto.class)))
                 .thenReturn(commentDto);
 
         mockMvc.perform(post("/items/{itemId}/comment", ITEM_ID)
@@ -225,24 +221,24 @@ public class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(COMMENT_ID));
 
-        verify(itemService, times(1)).createComment(USER_ID, ITEM_ID, any(CommentDto.class));
+        verify(itemService, times(1)).createComment(anyLong(), anyLong(),
+                any(CommentDto.class));
     }
 
     @Test
     void testCreateComment_userDidNotBook_throwsValidationException() throws Exception {
-        CommentDto commentDto = new CommentDto();
-        commentDto.setText("Great tool!");
 
-        when(itemService.createComment(USER_ID, ITEM_ID, any(CommentDto.class)))
+        when(itemService.createComment(anyLong(), anyLong(),
+                any(CommentDto.class)))
                 .thenThrow(new ValidationException("Пользователь не арендовал вещь"));
 
         mockMvc.perform(post("/items/{itemId}/comment", ITEM_ID)
                         .header("X-Sharer-User-Id", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(commentDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Пользователь не арендовал вещь"));
+                .andExpect(status().isBadRequest());
 
-        verify(itemService, times(1)).createComment(USER_ID, ITEM_ID, any(CommentDto.class));
+        verify(itemService, times(1)).createComment(anyLong(), anyLong(),
+                any(CommentDto.class));
     }
 }

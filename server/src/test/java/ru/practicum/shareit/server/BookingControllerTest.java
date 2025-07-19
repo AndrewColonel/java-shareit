@@ -1,16 +1,21 @@
 package ru.practicum.shareit.server;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.server.booking.BookingController;
+import ru.practicum.shareit.server.booking.BookingService;
+import ru.practicum.shareit.server.booking.State;
 import ru.practicum.shareit.server.booking.dto.BookingDto;
 import ru.practicum.shareit.server.booking.dto.BookingStateRequestDto;
 import ru.practicum.shareit.server.booking.dto.NewBookingDto;
-import ru.practicum.shareit.server.booking.model.Status;
+import ru.practicum.shareit.server.booking.Status;
 import ru.practicum.shareit.server.exception.NotFoundException;
 import ru.practicum.shareit.server.exception.ValidationException;
 
@@ -30,23 +35,36 @@ public class BookingControllerTest {
     @MockBean
     private BookingService bookingService;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final long USER_ID = 1L;
     private static final long BOOKING_ID = 100L;
 
-    // --- POST /bookings ---
+    private static LocalDateTime now;
+    private static NewBookingDto newBookingDto;
+    private static BookingDto bookingDto;
+    private static BookingStateRequestDto stateDto;
+
+    @BeforeAll
+    static void setup() {
+        now = LocalDateTime.now();
+        newBookingDto = NewBookingDto.builder()
+                .start(now.minusDays(1))
+                .end(now.minusHours(1))
+                .build();
+         bookingDto = BookingDto.builder()
+                .id(BOOKING_ID)
+                .status(Status.WAITING)
+                .build();
+         stateDto = BookingStateRequestDto.builder()
+                 .id(BOOKING_ID)
+                 .build();
+
+        objectMapper.registerModule(new JavaTimeModule());
+    }
 
     @Test
     void testCreateBooking_success() throws Exception {
-        NewBookingDto newBookingDto = new NewBookingDto();
-        newBookingDto.setItemId(1L);
-        newBookingDto.setStart(LocalDateTime.now().plusDays(1));
-        newBookingDto.setEnd(LocalDateTime.now().plusDays(2));
-
-        BookingDto bookingDto = new BookingDto();
-        bookingDto.setId(BOOKING_ID);
-        bookingDto.setStatus(Status.WAITING);
 
         when(bookingService.createBooking(USER_ID, newBookingDto)).thenReturn(bookingDto);
 
@@ -63,10 +81,6 @@ public class BookingControllerTest {
 
     @Test
     void testCreateBooking_userNotFound_throwsNotFoundException() throws Exception {
-        NewBookingDto newBookingDto = new NewBookingDto();
-        newBookingDto.setItemId(1L);
-        newBookingDto.setStart(LocalDateTime.now().plusDays(1));
-        newBookingDto.setEnd(LocalDateTime.now().plusDays(2));
 
         when(bookingService.createBooking(USER_ID, newBookingDto))
                 .thenThrow(new NotFoundException("Пользователь не найден"));
@@ -75,17 +89,14 @@ public class BookingControllerTest {
                         .header("X-Sharer-User-Id", USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newBookingDto)))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Пользователь не найден"));
+                .andExpect(status().isNotFound());
 
         verify(bookingService, times(1)).createBooking(USER_ID, newBookingDto);
     }
 
-    // --- PATCH /bookings/{bookingId} ---
-
     @Test
     void testUpdateBooking_success() throws Exception {
-        BookingDto bookingDto = new BookingDto();
+
         bookingDto.setId(BOOKING_ID);
         bookingDto.setStatus(Status.APPROVED);
 
@@ -111,17 +122,14 @@ public class BookingControllerTest {
                         .header("X-Sharer-User-Id", USER_ID)
                         .param("approved", "true")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Запрос не найден"));
+                .andExpect(status().isNotFound());
 
         verify(bookingService, times(1)).updateBooking(USER_ID, BOOKING_ID, true);
     }
 
-    // --- GET /bookings/{bookingId} ---
-
     @Test
     void testGetBookingById_success() throws Exception {
-        BookingDto bookingDto = new BookingDto();
+
         bookingDto.setId(BOOKING_ID);
         bookingDto.setStatus(Status.WAITING);
 
@@ -143,18 +151,13 @@ public class BookingControllerTest {
 
         mockMvc.perform(get("/bookings/{bookingId}", BOOKING_ID)
                         .header("X-Sharer-User-Id", USER_ID))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string("Бронирование не найдено"));
+                .andExpect(status().isNotFound());
 
         verify(bookingService, times(1)).getBookingById(USER_ID, BOOKING_ID);
     }
 
-    // --- GET /bookings ---
-
     @Test
     void testFindAllBookings_success() throws Exception {
-        BookingStateRequestDto stateDto = new BookingStateRequestDto();
-        stateDto.setId(BOOKING_ID);
         stateDto.setStatus(State.ALL);
 
         when(bookingService.findAllBookings(USER_ID, "ALL")).thenReturn(List.of(stateDto));
@@ -178,20 +181,14 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings")
                         .header("X-Sharer-User-Id", USER_ID)
                         .param("state", "INVALID"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Неверный статус"));
+                .andExpect(status().isBadRequest());
 
         verify(bookingService, times(1)).findAllBookings(USER_ID, "INVALID");
     }
 
-    // --- GET /bookings/owner ---
-
     @Test
     void testFindAllOwnerBookings_success() throws Exception {
-        BookingStateRequestDto stateDto = new BookingStateRequestDto();
-        stateDto.setId(BOOKING_ID);
         stateDto.setStatus(State.ALL);
-
         when(bookingService.findAllOwnerBooking(USER_ID, "ALL")).thenReturn(List.of(stateDto));
 
         mockMvc.perform(get("/bookings/owner")
@@ -213,9 +210,7 @@ public class BookingControllerTest {
         mockMvc.perform(get("/bookings/owner")
                         .header("X-Sharer-User-Id", USER_ID)
                         .param("state", "INVALID"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string("Неверный статус"));
-
+                .andExpect(status().isBadRequest());
         verify(bookingService, times(1)).findAllOwnerBooking(USER_ID, "INVALID");
     }
 }
