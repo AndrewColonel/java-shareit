@@ -39,7 +39,7 @@ public class BookingController {
                                          @Positive @PathVariable("bookingId") long bookingId,
                                          @RequestParam(name = "approved") String approved) {
         ApproveState approveState = ApproveState.from(approved)
-                .orElseThrow(() -> new IllegalArgumentException("Неизместный логический параметр "
+                .orElseThrow(() -> new IllegalArgumentException("Неизвестный логический параметр "
                         + approved));
         log.info("Ответ владельца {} на подтверждение {} бронирования  {}", userId, approved, bookingId);
         return bookingClient.updateBooking(userId, bookingId, approveState);

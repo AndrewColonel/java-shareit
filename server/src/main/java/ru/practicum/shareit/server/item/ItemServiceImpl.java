@@ -38,13 +38,12 @@ public class ItemServiceImpl implements ItemService {
         // валидация  userDto и userId выполняется контроллером
         //валидация владелца как зарегистрированного пользоыателя
         getUser(userId);
-        // валидация пользователя как владельца - isOwner(userId, itemDto.getOwner()) не проходитт по тесту)))
+        // валидация пользователя как владельца - isOwner(userId, itemDto.getOwner()) не проходит по тесту)))
         newItemDto.setOwner(userId);
 
         ItemRequest itemRequest = null;
         if (Objects.nonNull(newItemDto.getRequestId())) {
             itemRequest = getRequest(newItemDto.getRequestId());
-            newItemDto.setRequestId(itemRequest.getId());
         }
 
         return toItemDto(
@@ -56,7 +55,6 @@ public class ItemServiceImpl implements ItemService {
         // валидация  itemId и userId выполняется контроллером
         // Редактировать вещь может только её владелец.
         // валидация объекта Вещь для обновления
-        // isItemPatchDto(itemPatchDto); - проверка выполняется в gateway
         // валидация владелца как зарегистрированного пользоыателя
         getUser(userId);
         // Валидация вещи для обновления
@@ -154,7 +152,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemDto> searchItems(String searchQuery) {
-        // isStringQuery(searchQuery); - проверка выполняется в gateway
         if (searchQuery.isEmpty() || searchQuery.isBlank())
             return Set.of();
         return itemRepository.search(searchQuery).stream()
