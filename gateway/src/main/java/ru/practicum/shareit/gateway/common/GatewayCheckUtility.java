@@ -1,6 +1,7 @@
 package ru.practicum.shareit.gateway.common;
 
 import jakarta.validation.ValidationException;
+import org.springframework.http.ResponseEntity;
 import ru.practicum.shareit.gateway.booking.dto.NewBookingDto;
 import ru.practicum.shareit.gateway.item.dto.ItemPatchDto;
 import ru.practicum.shareit.gateway.user.dto.UserPatchDto;
@@ -26,8 +27,9 @@ public class GatewayCheckUtility {
 
     // метод валидации строки запроса
     public static void isStringQuery(String searchQuery) {
-        if (Objects.isNull(searchQuery))
+        if (Objects.isNull(searchQuery) || (searchQuery.isEmpty() || searchQuery.isBlank()))
             throw new ValidationException(String.format("Запрос %s не прошел валидацию", searchQuery));
+
     }
 
 

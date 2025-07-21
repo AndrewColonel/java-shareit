@@ -152,8 +152,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Collection<ItemDto> searchItems(String searchQuery) {
-        if (searchQuery.isEmpty() || searchQuery.isBlank())
-            return Set.of();
         return itemRepository.search(searchQuery).stream()
                 .filter(item -> item.getAvailable().equals(true))
                 .map(ItemMapper::toItemDto)
