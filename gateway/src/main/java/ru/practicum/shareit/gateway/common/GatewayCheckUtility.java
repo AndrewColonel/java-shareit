@@ -26,7 +26,7 @@ public class GatewayCheckUtility {
 
     // метод валидации строки запроса
     public static void isStringQuery(String searchQuery) {
-        if (Objects.isNull(searchQuery) || (searchQuery.isEmpty() || searchQuery.isBlank()))
+        if (Objects.isNull(searchQuery))
             throw new ValidationException(String.format("Запрос %s не прошел валидацию", searchQuery));
 
     }

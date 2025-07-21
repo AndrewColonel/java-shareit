@@ -49,10 +49,12 @@ public class ItemClient extends BaseClient {
 
     public ResponseEntity<Object> searchItems(String searchQuery) {
         isStringQuery(searchQuery);
+        if (searchQuery.isEmpty() || searchQuery.isBlank())
+            return ResponseEntity.noContent().build();
         return get("/search?text=" + searchQuery);
     }
 
     public ResponseEntity<Object> sreateComments(long userId, long itemId, CommentDto commentDto) {
-        return post("/" + itemId + "/comment", userId,commentDto);
+        return post("/" + itemId + "/comment", userId, commentDto);
     }
 }
