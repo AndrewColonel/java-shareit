@@ -1,7 +1,6 @@
 package ru.practicum.shareit.gateway.common;
 
 import jakarta.validation.ValidationException;
-import org.springframework.http.ResponseEntity;
 import ru.practicum.shareit.gateway.booking.dto.NewBookingDto;
 import ru.practicum.shareit.gateway.item.dto.ItemPatchDto;
 import ru.practicum.shareit.gateway.user.dto.UserPatchDto;
