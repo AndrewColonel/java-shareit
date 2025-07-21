@@ -12,6 +12,8 @@ import ru.practicum.shareit.gateway.item.dto.CommentDto;
 import ru.practicum.shareit.gateway.item.dto.ItemPatchDto;
 import ru.practicum.shareit.gateway.item.dto.NewItemDto;
 
+import java.util.Set;
+
 import static ru.practicum.shareit.gateway.common.GatewayCheckUtility.*;
 
 
@@ -50,7 +52,7 @@ public class ItemClient extends BaseClient {
     public ResponseEntity<Object> searchItems(String searchQuery) {
         isStringQuery(searchQuery);
         if (searchQuery.isEmpty() || searchQuery.isBlank())
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok(Set.of());
         return get("/search?text=" + searchQuery);
     }
 
