@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.server.booking.dto.BookingDto;
 import ru.practicum.shareit.server.booking.dto.BookingStateRequestDto;
+import ru.practicum.shareit.server.booking.dto.GetBookingParam;
 import ru.practicum.shareit.server.booking.dto.NewBookingDto;
 import ru.practicum.shareit.server.booking.model.Booking;
 import ru.practicum.shareit.server.exception.NotFoundException;
@@ -75,14 +76,16 @@ public class BookingServiceImpl implements BookingService {
     // REJECTED - «отклонённые»
     // Бронирования должны возвращаться отсортированными по дате от более новых к более старым.
     @Override
-    public Collection<BookingStateRequestDto> findAllBookings(long userId, String requestState) {
+    public Collection<BookingStateRequestDto> findAllBookings(long userId, GetBookingParam getBookingParam) {
         getUser(userId);
-        State state = stateConvert(requestState);
+        State state = stateConvert(getBookingParam.getState());
         List<BookingStateRequestDto> bookingStateRequestDtoList = new ArrayList<>();
         LocalDateTime requestDateTime = LocalDateTime.now();
         switch (state) {
             case ALL -> {
-                bookingStateRequestDtoList = bookingRepository.findByBooker_IdOrderByStartAsc(userId)
+                bookingStateRequestDtoList = bookingRepository.findByBooker_IdOrderByStartAsc(
+                        userId,
+                                getBookingParam.getPageable())
                         .stream()
                         .map(booking -> toBookingStateRequestDto(booking, requestDateTime))
                         .toList();

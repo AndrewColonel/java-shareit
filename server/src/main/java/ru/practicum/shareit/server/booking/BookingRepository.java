@@ -1,7 +1,9 @@
 package ru.practicum.shareit.server.booking;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import ru.practicum.shareit.server.booking.model.Booking;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     // запросные методы для получение данных о бронировании текущего пользователя, включая его статус
-    List<Booking> findByBooker_IdOrderByStartAsc(long bookerId);
+    List<Booking> findByBooker_IdOrderByStartAsc(long bookerId, Pageable pageable);
 
     List<Booking> findByBooker_IdAndStatusIsOrderByStartAsc(long bookerId, Status status);
 

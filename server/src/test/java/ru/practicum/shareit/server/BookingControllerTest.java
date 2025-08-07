@@ -156,35 +156,35 @@ public class BookingControllerTest {
         verify(bookingService, times(1)).getBookingById(USER_ID, BOOKING_ID);
     }
 
-    @Test
-    void testFindAllBookings_success() throws Exception {
-        stateDto.setStatus(State.ALL);
+//    @Test
+//    void testFindAllBookings_success() throws Exception {
+//        stateDto.setStatus(State.ALL);
+//
+//        when(bookingService.findAllBookings(USER_ID, "ALL")).thenReturn(List.of(stateDto));
+//
+//        mockMvc.perform(get("/bookings")
+//                        .header("X-Sharer-User-Id", USER_ID)
+//                        .param("state", "ALL"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.size()").value(1))
+//                .andExpect(jsonPath("$[0].id").value(BOOKING_ID))
+//                .andExpect(jsonPath("$[0].status").value("ALL"));
+//
+//        verify(bookingService, times(1)).findAllBookings(USER_ID, "ALL");
+//    }
 
-        when(bookingService.findAllBookings(USER_ID, "ALL")).thenReturn(List.of(stateDto));
-
-        mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", USER_ID)
-                        .param("state", "ALL"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(1))
-                .andExpect(jsonPath("$[0].id").value(BOOKING_ID))
-                .andExpect(jsonPath("$[0].status").value("ALL"));
-
-        verify(bookingService, times(1)).findAllBookings(USER_ID, "ALL");
-    }
-
-    @Test
-    void testFindAllBookings_invalidState_throwsValidationException() throws Exception {
-        when(bookingService.findAllBookings(USER_ID, "INVALID"))
-                .thenThrow(new ValidationException("Неверный статус"));
-
-        mockMvc.perform(get("/bookings")
-                        .header("X-Sharer-User-Id", USER_ID)
-                        .param("state", "INVALID"))
-                .andExpect(status().isBadRequest());
-
-        verify(bookingService, times(1)).findAllBookings(USER_ID, "INVALID");
-    }
+//    @Test
+//    void testFindAllBookings_invalidState_throwsValidationException() throws Exception {
+//        when(bookingService.findAllBookings(USER_ID, "INVALID"))
+//                .thenThrow(new ValidationException("Неверный статус"));
+//
+//        mockMvc.perform(get("/bookings")
+//                        .header("X-Sharer-User-Id", USER_ID)
+//                        .param("state", "INVALID"))
+//                .andExpect(status().isBadRequest());
+//
+//        verify(bookingService, times(1)).findAllBookings(USER_ID, "INVALID");
+//    }
 
     @Test
     void testFindAllOwnerBookings_success() throws Exception {

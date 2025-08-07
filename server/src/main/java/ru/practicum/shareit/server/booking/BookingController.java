@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.server.booking.dto.BookingDto;
 import ru.practicum.shareit.server.booking.dto.BookingStateRequestDto;
+import ru.practicum.shareit.server.booking.dto.GetBookingParam;
 import ru.practicum.shareit.server.booking.dto.NewBookingDto;
 
 import java.util.Collection;
@@ -46,8 +47,12 @@ public class BookingController {
     @GetMapping
     public Collection<BookingStateRequestDto> findAll(@RequestHeader("X-Sharer-User-Id") long userId,
                                                       @RequestParam(name = "state", required = false,
-                                                              defaultValue = "ALL") String state) {
-        return bookingService.findAllBookings(userId, state);
+                                                              defaultValue = "ALL") String state,
+                                                      @RequestParam(name = "from", required = false,
+                                                              defaultValue = "0") Integer from,
+                                                      @RequestParam(name = "size", required = false,
+                                                              defaultValue = "10") Integer size){
+        return bookingService.findAllBookings(userId, GetBookingParam.of(state, from, size));
     }
 
     // Получение списка бронирований для всех вещей текущего пользователя.
