@@ -23,7 +23,8 @@
 	<modules>
 		<module>gateway</module>
 		<module>server</module>
-	</modules>
+        <module>vaadin</module>
+    </modules>
 
 	<build>
 		<pluginManagement>
