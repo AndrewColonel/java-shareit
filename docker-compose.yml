@@ -42,3 +42,15 @@ services:
       timeout: 5s
       interval: 5s
       retries: 10
+
+  vaadinUi:
+    build: vaadin
+    image: shareit-vaadin
+    container_name: shareit-vaadin
+    ports:
+      - "8888:8888"
+    depends_on:
+      - server
+    environment:
+      - SHAREIT_SERVER_URL=http://server:8888
+
